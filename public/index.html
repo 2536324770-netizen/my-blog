@@ -803,36 +803,17 @@
 
   <!-- Fixed Architectural Blueprint Compass Circles (Pure Geometric Background Layer) -->
   <div class="blueprint-guide fixed inset-0 pointer-events-none z-0 overflow-hidden transition-opacity duration-500">
-    <svg class="extra-geometry absolute top-[32%] -left-24 w-[380px] h-[380px]" viewBox="0 0 320 320" fill="none" aria-hidden="true">
-      <circle cx="160" cy="160" r="125" stroke="#8ECDE8" stroke-width="1" stroke-dasharray="4 7" />
-      <circle cx="160" cy="160" r="92" stroke="#F7A8B8" stroke-width="1" />
-      <path d="M160 68 A92 92 0 0 1 252 160 L160 160 Z" fill="url(#pat-grating-cyan)" opacity=".55" />
-      <path d="M160 160 L68 160 A92 92 0 0 0 160 252 Z" fill="url(#pat-dots-orange)" opacity=".65" />
-      <path d="M20 160 H300 M160 20 V300" stroke="#8ECDE8" stroke-width=".7" />
-      <rect x="96" y="96" width="128" height="128" stroke="#F7A8B8" stroke-width=".8" transform="rotate(45 160 160)" />
-    </svg>
-    <svg class="extra-geometry extra-geometry-secondary absolute bottom-[12%] -right-20 w-[340px] h-[340px]" viewBox="0 0 300 300" fill="none" aria-hidden="true">
-      <circle cx="150" cy="150" r="112" stroke="#F7A8B8" stroke-width="1" />
-      <circle cx="150" cy="150" r="78" stroke="#8ECDE8" stroke-width="1" stroke-dasharray="12 6" />
-      <path d="M38 150 A112 112 0 0 1 262 150" fill="url(#pat-grating-orange)" opacity=".5" />
-      <path d="M70 230 L230 70 M40 150 H260 M150 40 V260" stroke="#8ECDE8" stroke-width=".8" />
-      <circle cx="150" cy="150" r="24" stroke="#F7A8B8" stroke-width="1.2" />
-      <circle cx="150" cy="150" r="4" fill="#8ECDE8" />
-    </svg>
-    <!-- Top-Right Deconstructed Planar Circle Composition (线构圆 + 切分圆弧 + 极坐标网) -->
-    <svg class="absolute -top-40 -right-40 w-[780px] h-[780px] opacity-30" viewBox="0 0 600 600" fill="none">
+    <!-- Top-Right 主要几何构成（降低不透明度，拉开距离） -->
+    <svg class="absolute -top-32 -right-32 w-[680px] h-[680px] opacity-20" viewBox="0 0 600 600" fill="none">
       <!-- Grating Circle Quadrant -->
-      <path d="M 300 60 A 240 240 0 0 1 540 300 L 300 300 Z" fill="url(#pat-grating-cyan)" opacity="0.45" />
+      <path d="M 300 60 A 240 240 0 0 1 540 300 L 300 300 Z" fill="url(#pat-grating-cyan)" opacity="0.35" />
       <!-- Halftone Dot Circle Quadrant -->
-      <path d="M 300 540 A 240 240 0 0 1 60 300 L 300 300 Z" fill="url(#pat-dots-orange)" opacity="0.45" />
+      <path d="M 300 540 A 240 240 0 0 1 60 300 L 300 300 Z" fill="url(#pat-dots-orange)" opacity="0.35" />
       <!-- Concentric Vector Rings -->
       <circle cx="300" cy="300" r="285" stroke="#8ECDE8" stroke-width="0.8" stroke-dasharray="4 8" class="halo-spin" style="transform-origin: 300px 300px;" />
       <circle cx="300" cy="300" r="240" stroke="#F7A8B8" stroke-width="1.2" />
       <circle cx="300" cy="300" r="190" stroke="#8ECDE8" stroke-width="0.8" stroke-dasharray="28 8 4 8" class="halo-spin-rev" style="transform-origin: 300px 300px;" />
       <circle cx="300" cy="300" r="134" stroke="#F3EFE6" stroke-width="0.6" stroke-opacity="0.5" />
-      <!-- Eccentric Golden Ratio Inner Circles -->
-      <circle cx="356" cy="244" r="78" stroke="#F7A8B8" stroke-width="1.2" fill="rgba(247,168,184,0.06)" />
-      <circle cx="250" cy="350" r="52" fill="url(#pat-grating-ivory)" opacity="0.35" />
       <!-- Orthogonal & 45-Deg Construction Chords -->
       <line x1="0" y1="300" x2="600" y2="300" stroke="#8ECDE8" stroke-width="0.6" />
       <line x1="300" y1="0" x2="300" y2="600" stroke="#F7A8B8" stroke-width="0.6" />
@@ -840,17 +821,14 @@
       <rect x="130" y="130" width="340" height="340" stroke="#8ECDE8" stroke-width="0.6" transform="rotate(45 300 300)" />
     </svg>
 
-    <!-- Bottom-Left Bauhaus Sliced Circle Watermark -->
-    <svg class="absolute -bottom-52 -left-36 w-[620px] h-[620px] opacity-20" viewBox="0 0 500 500" fill="none">
+    <!-- Bottom-Left 次要几何（更低透明度，拉开更远距离） -->
+    <svg class="absolute -bottom-48 -left-48 w-[520px] h-[520px] opacity-15" viewBox="0 0 500 500" fill="none">
       <circle cx="250" cy="250" r="210" stroke="#8ECDE8" stroke-width="1" />
-      <path d="M 80 250 A 170 170 0 0 1 420 250 Z" fill="url(#pat-grating-orange)" />
+      <path d="M 80 250 A 170 170 0 0 1 420 250 Z" fill="url(#pat-grating-orange)" opacity="0.6" />
       <path d="M 95 270 A 170 170 0 0 0 435 270 Z" stroke="#F3EFE6" stroke-width="1.5" fill="rgba(142,205,232,0.08)" />
       <circle cx="250" cy="250" r="85" fill="#05131A" stroke="#F7A8B8" stroke-width="1.5" />
     </svg>
 
-    <!-- Golden Ratio Measurement Crosshair Lines -->
-    <div class="hidden xl:block absolute top-0 bottom-0 left-[68px] w-px bg-gradient-to-b from-cyan-400/30 via-pink-300/25 to-cyan-400/30"></div>
-    <div class="hidden xl:block absolute top-0 bottom-0 right-[52px] w-px bg-cyan-400/15"></div>
   </div>
 
   <!-- 精简的几何光点层 -->
