@@ -3189,8 +3189,27 @@
       const bodyEl = document.getElementById('modalPostBody');
       console.log('[DEBUG] Body element:', bodyEl);
       console.log('[DEBUG] Setting innerHTML, length:', bodyHtml.length);
+
+      // 清除任何可能影响显示的样式
+      bodyEl.style.cssText = '';
       bodyEl.innerHTML = bodyHtml;
+
+      // 强制确保内容可见
+      bodyEl.style.display = 'block';
+      bodyEl.style.visibility = 'visible';
+      bodyEl.style.opacity = '1';
+      bodyEl.style.minHeight = '200px';
+      bodyEl.style.position = 'relative';
+      bodyEl.style.zIndex = '1';
+
       console.log('[DEBUG] After setting innerHTML, bodyEl.innerHTML:', bodyEl.innerHTML.substring(0, 200));
+      console.log('[DEBUG] Body element computed styles:', {
+        display: window.getComputedStyle(bodyEl).display,
+        visibility: window.getComputedStyle(bodyEl).visibility,
+        opacity: window.getComputedStyle(bodyEl).opacity,
+        color: window.getComputedStyle(bodyEl).color,
+        zIndex: window.getComputedStyle(bodyEl).zIndex
+      });
 
       const tocContainer = document.getElementById('modalTocContainer');
       const tocList = document.getElementById('modalTocList');
@@ -3233,9 +3252,30 @@
 
       const modal = document.getElementById('articleModal');
       modal.classList.remove('hidden');
+
+      // 确保模态框容器可见
+      modal.style.display = 'flex';
+      modal.style.zIndex = '9999';
+
       const scrollEl = document.getElementById('articleModalScroll');
       scrollEl.scrollTop = 0;
+
+      // 确保滚动容器可见
+      scrollEl.style.display = 'block';
+      scrollEl.style.overflow = 'auto';
+
       document.getElementById('readingProgressBar').style.width = '12%';
+
+      // 最后再检查一次内容是否显示
+      setTimeout(() => {
+        const bodyEl2 = document.getElementById('modalPostBody');
+        if (bodyEl2 && bodyEl2.innerHTML && bodyEl2.innerHTML.trim().length > 0) {
+          console.log('[DEBUG] ✓ 文章内容已成功渲染，长度:', bodyEl2.innerHTML.length);
+          console.log('[DEBUG] ✓ 前 200 字符:', bodyEl2.innerHTML.substring(0, 200));
+        } else {
+          console.error('[ERROR] ✗ 文章内容渲染失败！');
+        }
+      }, 100);
 
       unlockMedal('medal-1');
       renderHomePosts();
