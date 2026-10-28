@@ -3393,7 +3393,11 @@
     }
 
     function renderMarkdownWithToc(contentArray) {
-      const lines = Array.isArray(contentArray) ? contentArray.join('\n\n').split('\n') : String(contentArray || '').split('\n');
+      // Handle undefined/null/empty content gracefully
+      if (!contentArray || (Array.isArray(contentArray) && contentArray.length === 0)) {
+        return { htmlContent: '<p class="text-slate-400 italic">文章内容为空</p>', tocItems: [] };
+      }
+      const lines = Array.isArray(contentArray) ? contentArray.join('\n\n').split('\n') : String(contentArray).split('\n');
       const tocItems = [];
       let htmlOut = '';
       let inCodeBlock = false;
