@@ -424,6 +424,12 @@
     .music-volume { display: flex; align-items: center; gap: .4rem; color: #9bb0bc; font-size: .7rem; margin-left: auto; }
     .music-volume input { width: 65px; }
     #music-controls[hidden], #site-music-audio[hidden] { display: none !important; }
+    .anime-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:1rem; }
+    .anime-card { overflow:hidden; border:1px solid rgba(151,202,224,.35); background:#0b1a23; transition:transform .25s,border-color .25s,box-shadow .25s; }
+    .anime-card:hover { transform:translateY(-5px); border-color:#ebaabb; box-shadow:5px 5px 0 rgba(152,201,225,.16); }
+    .anime-cover { aspect-ratio: 4/3; background:repeating-linear-gradient(135deg,#142b38 0,#142b38 2px,#0c1b25 2px,#0c1b25 13px); display:grid; place-items:center; color:#97c9e1; letter-spacing:.2em; font-size:.75rem; overflow:hidden; }
+    .anime-cover img { width:100%; height:100%; object-fit:cover; transition:transform .45s; } .anime-card:hover img { transform:scale(1.05); }
+    .anime-body { padding:1.2rem; } .anime-label { color:#e9a6b7; font-size:.65rem; letter-spacing:.12em; } .anime-body h3 { margin:.6rem 0; font-size:1.15rem; font-weight:700; } .anime-body p { color:#a9bac6; font-size:.85rem; line-height:1.7; white-space:pre-wrap; overflow-wrap:anywhere; }
     .project-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
     .project-card { min-width: 0; background: rgba(9,31,43,.9); border: 1px solid rgba(142,205,232,.25); padding: 1.2rem; transition: transform .25s ease, border-color .25s ease; }
     .project-card:hover { transform: translateY(-3px); border-color: #f7a8b8; }
@@ -3525,6 +3531,7 @@
             if (Array.isArray(data.friendLinks)) appState.friendLinks = data.friendLinks;
             if (Array.isArray(data.socialLinks)) {
               localStorage.setItem('simple_blog_social_v1', JSON.stringify(data.socialLinks));
+      localStorage.setItem('simple_blog_anime_v1', JSON.stringify(Array.isArray(data.anime) ? data.anime : []));
               renderSocialLinks();
             }
             if (Array.isArray(data.projects)) {
@@ -4421,6 +4428,27 @@ function readProjects() {
   try { const projects = JSON.parse(localStorage.getItem('simple_blog_projects_v1') || '[]'); return Array.isArray(projects) ? projects : []; }
   catch (_) { return []; }
 }
+function readAnime() {
+  try { const data = JSON.parse(localStorage.getItem('simple_blog_anime_v1') || '[]'); return Array.isArray(data) ? data : []; } catch (_) { return []; }
+}
+function renderAnime() {
+  const list = document.getElementById('anime-list'); if (!list) return; list.replaceChildren();
+  const items = readAnime();
+  if (!items.length) { const empty = document.createElement('p'); empty.className = 'text-sm text-slate-400'; empty.textContent = '还没有添加番剧推荐。'; list.append(empty); return; }
+  items.forEach((item, index) => {
+    const card = document.createElement('article'); card.className = 'anime-card';
+    const cover = document.createElement('div'); cover.className = 'anime-cover';
+    if (item.image && /^\/api\/anime-image\?id=[a-f0-9-]+$/.test(item.image)) { const img = document.createElement('img'); img.src = item.image; img.alt = (item.name || '番剧') + '封面'; img.loading = 'lazy'; cover.append(img); } else cover.textContent = 'ANIME // 推薦';
+    const body = document.createElement('div'); body.className = 'anime-body';
+    const label = document.createElement('div'); label.className = 'anime-label'; label.textContent = 'RECOMMENDATION // ' + String(index + 1).padStart(2, '0');
+    const title = document.createElement('h3'); title.textContent = item.name;
+    const desc = document.createElement('p'); desc.textContent = item.description || '';
+    const controls = document.createElement('div'); controls.className = 'owner-action flex gap-4 mt-4 text-xs';
+    const edit = document.createElement('button'); edit.type = 'button'; edit.className = 'text-cyan-300 underline'; edit.textContent = '编辑'; edit.onclick = () => window.editAnime(index);
+    const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'text-pink-200 underline'; remove.textContent = '删除'; remove.onclick = () => window.deleteAnime(index);
+    controls.append(edit, remove); body.append(label, title, desc, controls); card.append(cover, body); list.append(card);
+  });
+}
 function renderProjects() {
   const projects = readProjects();
   for (const id of ['home-project-list', 'project-list']) {
@@ -4623,6 +4651,9 @@ window.addEventListener('DOMContentLoaded', () => {
   addProjectLink('nav-projects', aboutNav.parentElement, aboutNav, 'nav-tab px-3.5 py-2 text-xs font-mono tracking-wider flex items-center cursor-pointer');
   const mobileAbout = document.querySelector(`#mobileNavMenu button[onclick="switchSection('resting')"]`);
   addProjectLink('mobile-nav-projects', mobileAbout.parentElement, mobileAbout, 'px-3 py-2 text-xs font-mono text-left bg-slate-900 text-slate-300 border border-slate-800 cursor-pointer');
+  for (const [id, anchor] of [['nav-anime', aboutNav], ['mobile-nav-anime', mobileAbout]]) {
+    const button = document.createElement('button'); button.type = 'button'; button.id = id; button.className = anchor.className; button.textContent = '番剧推荐'; button.setAttribute('onclick', "switchSection('anime')"); anchor.parentElement.insertBefore(button, anchor);
+  }
   text('header button[onclick="openComposeModal()"]', '+ 写文章');
   const homeHeading = document.querySelector('#homePostsGrid').parentElement.querySelector('h2');
   if (homeHeading) homeHeading.textContent = '最新文章';
@@ -4738,6 +4769,44 @@ window.addEventListener('DOMContentLoaded', () => {
       <div class="flex gap-3 text-xs"><button type="submit" class="px-3 py-2 bg-[#F7A8B8] text-slate-950">保存项目</button><button type="button" id="project-cancel" class="px-3 py-2 border border-cyan-500/40 text-cyan-300">取消</button></div></form></div><div id="project-list" class="project-grid"></div>`;
     document.querySelector('main').append(section);
   }
+  if (!document.getElementById('sec-anime')) {
+    const section = document.createElement('section'); section.id = 'sec-anime'; section.className = 'hidden space-y-6';
+    section.innerHTML = `<div class="ak-panel p-6 sm:p-8 space-y-5"><div class="flex flex-wrap justify-between items-center gap-3"><div><div class="text-xs tracking-widest text-pink-200">ANIME RECOMMENDATIONS</div><h2 class="font-serif text-2xl font-black mt-1">番剧推荐</h2><p class="text-sm text-slate-400 mt-2">收藏一些想与你分享的故事。</p></div><button type="button" id="anime-add" class="owner-action px-3 py-2 text-xs bg-[#F7A8B8] text-slate-950">＋ 添加番剧</button></div>
+      <form id="anime-form" class="owner-action hidden space-y-3 p-4 border border-cyan-500/30"><h3 id="anime-form-title" class="text-sm text-cyan-300">添加番剧</h3>
+      <label class="block text-xs text-slate-300">番剧名称<input name="animeName" required maxlength="100" class="block w-full mt-1 px-3 py-2 bg-slate-950 border border-cyan-500/40 text-white"></label>
+      <label class="block text-xs text-slate-300">封面图片<input name="animeImage" type="file" accept="image/jpeg,image/png,image/webp" class="block w-full mt-2 text-slate-300"><span class="block mt-1 text-slate-400">选择图片上传；编辑时不选择图片会保留原封面。</span></label>
+      <label class="block text-xs text-slate-300">简介<textarea name="animeDescription" maxlength="1000" rows="4" class="block w-full mt-1 px-3 py-2 bg-slate-950 border border-cyan-500/40 text-white"></textarea></label>
+      <div class="flex gap-3 text-xs"><button type="submit" class="px-3 py-2 bg-[#F7A8B8] text-slate-950">保存番剧</button><button type="button" id="anime-cancel" class="px-3 py-2 border border-cyan-500/40 text-cyan-300">取消</button></div></form></div><div id="anime-list" class="anime-grid"></div>`;
+    document.querySelector('main').append(section);
+  }
+  let animeEditIndex = null;
+  const animeForm = document.getElementById('anime-form');
+  function openAnimeEditor(index) {
+    animeEditIndex = index; const item = index === null ? null : readAnime()[index]; animeForm.reset();
+    animeForm.elements.animeName.value = item?.name || ''; animeForm.elements.animeDescription.value = item?.description || '';
+    document.getElementById('anime-form-title').textContent = item ? '编辑番剧' : '添加番剧'; animeForm.classList.remove('hidden'); animeForm.elements.animeName.focus();
+  }
+  document.getElementById('anime-add').onclick = () => openAnimeEditor(null);
+  document.getElementById('anime-cancel').onclick = () => animeForm.classList.add('hidden');
+  window.editAnime = index => openAnimeEditor(index);
+  window.deleteAnime = index => { const items = readAnime(); if (!items[index] || !confirm('确定删除这条番剧推荐吗？')) return; items.splice(index, 1); try { localStorage.setItem('simple_blog_anime_v1', JSON.stringify(items)); window.queueCloudContentSave?.(); animeForm.classList.add('hidden'); renderAnime(); } catch (_) { showToast('保存失败，请检查浏览器存储设置', 'orange'); } };
+  animeForm.onsubmit = async event => {
+    event.preventDefault(); const name = animeForm.elements.animeName.value.trim(); if (!name) return;
+    const items = readAnime(); const previous = animeEditIndex === null ? null : items[animeEditIndex];
+    const button = animeForm.querySelector('[type="submit"]'); button.disabled = true;
+    try {
+      let image = previous?.image || ''; const file = animeForm.elements.animeImage.files[0];
+      if (file) { if (!['image/jpeg','image/png','image/webp'].includes(file.type) || file.size > 10 * 1024 * 1024) throw new Error('请选择 10 MB 以内的 JPG、PNG 或 WebP 图片');
+        const bitmap = await createImageBitmap(file); const scale = Math.min(1, 800 / Math.max(bitmap.width, bitmap.height)); const canvas = document.createElement('canvas'); canvas.width = Math.max(1, Math.round(bitmap.width * scale)); canvas.height = Math.max(1, Math.round(bitmap.height * scale)); canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height); bitmap.close();
+        const encoded = canvas.toDataURL('image/webp', .78); if (!encoded.startsWith('data:image/webp;base64,')) throw new Error('浏览器不支持图片处理，请使用新版浏览器');
+        image = await window.uploadAnimeImage(encoded);
+      }
+      const item = { name, description: animeForm.elements.animeDescription.value.trim(), image };
+      if (animeEditIndex === null) items.push(item); else if (previous) items[animeEditIndex] = item; else throw new Error('该番剧已不存在，请刷新页面');
+      localStorage.setItem('simple_blog_anime_v1', JSON.stringify(items)); window.queueCloudContentSave?.(); animeForm.classList.add('hidden'); renderAnime(); showToast('番剧已保存', 'cyan');
+    } catch (error) { showToast(error.message || '保存失败，请稍后重试', 'orange'); } finally { button.disabled = false; }
+  };
+  renderAnime();
   if (!document.getElementById('home-projects')) {
     const section = document.createElement('div'); section.id = 'home-projects'; section.className = 'space-y-5';
     section.innerHTML = `<div class="flex items-end justify-between gap-4 border-b border-cyan-400/40 pb-4"><div><div class="text-xs tracking-widest text-pink-200">PROJECTS</div><h2 class="font-serif font-black text-2xl mt-1">项目</h2></div><button type="button" onclick="switchSection('projects')" class="text-sm text-cyan-300">查看全部 →</button></div><div id="home-project-list" class="project-grid"></div>`;
@@ -4940,9 +5009,9 @@ window.addEventListener('DOMContentLoaded', () => {
   // Keep functionality available in a compact navigation and avoid loud transition effects.
   appState.soundEnabled = false;
   window.switchSection = function(key) {
-    if (!['sanctuary','audience','resting','guestbook','projects','cloudflare','settings'].includes(key)) return;
+    if (!['sanctuary','audience','resting','guestbook','projects','anime','cloudflare','settings'].includes(key)) return;
     if (['cloudflare','settings'].includes(key) && !document.body.classList.contains('admin-mode')) return;
-    ['sanctuary','audience','workshop','metrics','resting','guestbook','projects','cloudflare','settings'].forEach(k => {
+    ['sanctuary','audience','workshop','metrics','resting','guestbook','projects','anime','cloudflare','settings'].forEach(k => {
       const sec=document.getElementById('sec-'+k); if(sec) sec.classList.toggle('hidden', k!==key);
       const nav=document.getElementById('nav-'+k);
       if (nav) { if (k === key) nav.setAttribute('aria-current', 'page'); else nav.removeAttribute('aria-current'); }
@@ -4970,7 +5039,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const initialMobileNav = document.querySelector(`#mobileNavMenu button[onclick="switchSection('${appState.currentSection}')"]`);
   if (initialMobileNav) initialMobileNav.setAttribute('aria-current', 'page');
   if (location.hash === '#rongfu') enterOwnerMode();
-  if (!adminMode && !['sanctuary', 'audience', 'resting', 'guestbook', 'projects'].includes(appState.currentSection)) switchSection('sanctuary');
+  if (!adminMode && !['sanctuary', 'audience', 'resting', 'guestbook', 'projects', 'anime'].includes(appState.currentSection)) switchSection('sanctuary');
   if ('IntersectionObserver' in window && !motionPreference.matches) {
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
@@ -5003,7 +5072,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const backupPrefix = 'simple_blog_cloud_backup_';
 
   function snapshot() {
-    return JSON.parse(JSON.stringify({ posts: appState.posts, friendLinks: appState.friendLinks, projects: readProjects(), socialLinks: readSocialLinks(), siteSettings: readSiteSettings() }));
+    return JSON.parse(JSON.stringify({ posts: appState.posts, friendLinks: appState.friendLinks, projects: readProjects(), socialLinks: readSocialLinks(), siteSettings: readSiteSettings(), anime: readAnime() }));
   }
   function meaningful(data) {
     return JSON.stringify({ ...data, posts: (data.posts || []).map(post => {
@@ -5021,6 +5090,10 @@ window.addEventListener('DOMContentLoaded', () => {
     if (!response.ok) { const error = new Error(result.error || '云端操作失败'); error.status = response.status; throw error; }
     return result;
   }
+  window.uploadAnimeImage = async encoded => {
+    if (!password || !initialized) throw new Error('请先登录站长模式并完成云端初始化');
+    const result = await api('/api/anime-image', 'POST', { image: encoded }, password); return result.url;
+  };
   function applyCloud(data) {
     if (!data || !Array.isArray(data.posts) || !Array.isArray(data.friendLinks) || !Array.isArray(data.projects) || !Array.isArray(data.socialLinks) || !data.siteSettings || typeof data.siteSettings !== 'object') throw new Error('云端数据格式不正确');
     const before = snapshot();
@@ -5036,8 +5109,9 @@ window.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem(siteSettingsKey, JSON.stringify(data.siteSettings));
       localStorage.setItem('simple_blog_projects_v1', JSON.stringify(data.projects));
       localStorage.setItem('simple_blog_social_v1', JSON.stringify(data.socialLinks));
+      localStorage.setItem('simple_blog_anime_v1', JSON.stringify(Array.isArray(data.anime) ? data.anime : []));
       appState.posts = data.posts; appState.friendLinks = data.friendLinks;
-      renderHomePosts(); renderArchiveSection(); renderFriendLinks(); renderProjects(); renderSocialLinks(); renderCmsDashboard();
+      renderHomePosts(); renderArchiveSection(); renderFriendLinks(); renderProjects(); renderAnime(); renderSocialLinks(); renderCmsDashboard();
       const settings = readSiteSettings(); applySiteSettings(settings); if (window.refreshSiteSettingsForm) window.refreshSiteSettingsForm(settings);
     } finally { applying = false; }
   }

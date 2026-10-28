@@ -3,7 +3,7 @@ import { adminAuthorized, clientKey } from './guestbook.js';
 const headers = { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' };
 const reply = (data, status = 200) => new Response(JSON.stringify(data), { status, headers });
 
-async function authorized(request, env) {
+export async function authorized(request, env) {
   if (!env.GUESTBOOK_ADMIN_PASSWORD) return { ok: false, status: 503, error: '站长密码尚未设置' };
   const origin = request.headers.get('Origin');
   try { if (!origin || new URL(origin).origin !== new URL(request.url).origin) return { ok: false, status: 403, error: '请求来源不允许' }; }
@@ -46,7 +46,7 @@ export async function onRequest({ request, env }) {
     let body; try { body = JSON.parse(new TextDecoder().decode(bytes)); } catch (_) { return reply({ error: '请求格式错误' }, 400); }
     const data = body?.data;
     if (!Number.isSafeInteger(body?.revision) || body.revision < 0 || !data || !Array.isArray(data.posts) || !Array.isArray(data.friendLinks) || !Array.isArray(data.projects) || !Array.isArray(data.socialLinks) || !data.siteSettings || typeof data.siteSettings !== 'object' || Array.isArray(data.siteSettings)) return reply({ error: '网站数据格式错误' }, 400);
-    const content = JSON.stringify({ posts: data.posts, friendLinks: data.friendLinks, projects: data.projects, socialLinks: data.socialLinks, siteSettings: data.siteSettings });
+    const content = JSON.stringify({ posts: data.posts, friendLinks: data.friendLinks, projects: data.projects, socialLinks: data.socialLinks, siteSettings: data.siteSettings, anime: Array.isArray(data.anime) ? data.anime : [] });
     const now = new Date().toISOString();
     let result;
     if (body.revision === 0) {
