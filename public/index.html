@@ -4815,6 +4815,100 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 </script>
+<script id="shared-guestbook-client">
+window.addEventListener('DOMContentLoaded', () => {
+  const guestbook = document.getElementById('sec-guestbook');
+  const list = document.getElementById('confessListContainer');
+  const count = document.getElementById('confessTotalCount');
+  const authorInput = document.getElementById('confessAuthorInput');
+  const contentInput = document.getElementById('confessContentInput');
+  const submit = guestbook.querySelector('button[onclick="submitConfession()"]');
+  const notice = submit.previousElementSibling;
+  const endpoint = '/api/guestbook';
+  let messages = [];
+  let ready = false;
+  let pending = false;
+  authorInput.maxLength = 40;
+  contentInput.maxLength = 1000;
+  notice.textContent = '留言发布后，所有访客都可以看到。';
+
+  async function request(method, body, password) {
+    const headers = {};
+    if (body) headers['Content-Type'] = 'application/json';
+    if (password) headers['X-Guestbook-Password'] = password;
+    const response = await fetch(endpoint, { method, headers, body: body ? JSON.stringify(body) : undefined, cache: 'no-store', credentials: 'same-origin' });
+    let data; try { data = await response.json(); } catch (_) { throw new Error('留言服务尚未配置或返回了无效数据'); }
+    if (!response.ok) throw new Error(data.error || '留言服务暂时不可用');
+    return data;
+  }
+
+  function displayMessages() {
+    count.textContent = messages.length;
+    list.replaceChildren();
+    if (!ready) { list.textContent = '正在加载留言……'; return; }
+    if (!messages.length) { list.textContent = '还没有留言，欢迎留下第一条。'; return; }
+    messages.forEach(item => {
+      const card = document.createElement('div'); card.className = 'p-4 bg-slate-950/85 border-l-4 border-l-cyan-400 border border-cyan-500/20 space-y-2';
+      const heading = document.createElement('div'); heading.className = 'flex flex-wrap justify-between gap-2 text-xs';
+      const name = document.createElement('strong'); name.className = 'text-[#F3EFE6]'; name.textContent = item.author || '匿名访客';
+      const time = document.createElement('span'); time.className = 'text-slate-400';
+      const date = new Date(item.created_at); time.textContent = Number.isNaN(date.getTime()) ? '' : date.toLocaleString('zh-CN');
+      const text = document.createElement('p'); text.className = 'text-sm text-slate-200 leading-relaxed whitespace-pre-wrap break-words'; text.textContent = item.content;
+      const controls = document.createElement('div'); controls.className = 'owner-action flex gap-3 text-xs';
+      const edit = document.createElement('button'); edit.type = 'button'; edit.className = 'text-cyan-300 underline'; edit.textContent = '编辑';
+      const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'text-pink-200 underline'; remove.textContent = '删除';
+      edit.addEventListener('click', () => {
+        const editor = document.createElement('textarea'); editor.rows = 3; editor.maxLength = 1000; editor.value = item.content;
+        editor.className = 'w-full p-2 bg-slate-900 border border-cyan-500/40 text-white text-sm';
+        const save = document.createElement('button'); save.type = 'button'; save.className = 'text-cyan-300 underline'; save.textContent = '保存';
+        const cancel = document.createElement('button'); cancel.type = 'button'; cancel.className = 'text-slate-300 underline'; cancel.textContent = '取消';
+        const actions = document.createElement('div'); actions.className = 'owner-action flex gap-3 text-xs'; actions.append(save, cancel);
+        save.onclick = async () => {
+          const content = editor.value.trim(); if (!content) { showToast('留言内容不能为空', 'orange'); return; }
+          const password = prompt('请输入在 Cloudflare 中设置的留言板站长密码：'); if (password === null) return;
+          try { await request('PATCH', { id: item.id, content }, password); await refresh(); showToast('留言已更新', 'cyan'); }
+          catch (error) { showToast(error.message, 'orange'); }
+        };
+        cancel.onclick = displayMessages; text.replaceWith(editor); controls.replaceWith(actions); editor.focus();
+      });
+      remove.addEventListener('click', async () => {
+        if (!confirm('确定删除这条留言吗？')) return;
+        const password = prompt('请输入在 Cloudflare 中设置的留言板站长密码：'); if (password === null) return;
+        try { await request('DELETE', { id: item.id }, password); await refresh(); showToast('留言已删除', 'cyan'); }
+        catch (error) { showToast(error.message, 'orange'); }
+      });
+      heading.append(name, time); controls.append(edit, remove); card.append(heading, text, controls); list.append(card);
+    });
+  }
+
+  async function refresh() {
+    try {
+      const data = await request('GET');
+      if (!Array.isArray(data.messages)) throw new Error('留言数据格式不正确');
+      messages = data.messages; ready = true; notice.textContent = '留言发布后，所有访客都可以看到。'; displayMessages();
+    } catch (_) {
+      ready = false; count.textContent = '—'; list.textContent = '暂时无法连接留言板，请稍后刷新重试。';
+      notice.textContent = '留言板未连接，暂时无法发送留言。';
+    }
+  }
+
+  window.submitConfession = async function() {
+    if (pending) return;
+    if (!ready) { showToast('留言板未连接，请稍后重试', 'orange'); return; }
+    const content = contentInput.value.trim(); if (!content) { showToast('请先输入留言内容', 'orange'); return; }
+    pending = true; submit.disabled = true;
+    try {
+      await request('POST', { author: authorInput.value.trim(), content });
+      contentInput.value = ''; await refresh(); showToast('留言已发布', 'cyan');
+    } catch (error) { showToast(error.message, 'orange'); }
+    finally { pending = false; submit.disabled = false; }
+  };
+  displayMessages();
+  refresh();
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && !guestbook.classList.contains('hidden')) refresh(); });
+  setInterval(() => { if (!document.hidden && !guestbook.classList.contains('hidden') && !guestbook.querySelector('textarea:focus')) refresh(); }, 60000);
+});
+</script>
 <script id="baked-cloudflare-state">
 (function () {
   try {

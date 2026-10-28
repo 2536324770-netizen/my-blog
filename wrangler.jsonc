@@ -1,0 +1,18 @@
+{
+  "name": "my-blog",
+  "main": "src/worker.js",
+  "keep_vars": true,
+  "compatibility_date": "2026-10-28",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "GUESTBOOK_DB",
+      "database_name": "blog-guestbook",
+      "database_id": "964674df-9bd9-450d-96cd-2b868d0ba24a"
+    }
+  ]
+}
