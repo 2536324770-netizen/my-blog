@@ -408,6 +408,22 @@
     .simple-actions button { border:1px solid rgba(142,205,232,.4); padding:.6rem .9rem; color:#a5f3fc; font-size:.82rem; }
     .simple-actions button:first-child { background:#f7a8b8; color:#05131a; border-color:#f7a8b8; font-weight:700; }
     #home-location[hidden] { display: none !important; }
+    .music-panel { position: relative; overflow: hidden; background: linear-gradient(135deg, rgba(12,43,56,.94), rgba(7,24,33,.97)); }
+    .music-panel::after { content: ''; position: absolute; right: -28px; top: -38px; width: 125px; height: 125px; border: 1px solid rgba(142,205,232,.18); border-radius: 50%; box-shadow: 0 0 0 13px rgba(247,168,184,.035), 0 0 0 27px rgba(142,205,232,.025); pointer-events: none; }
+    .music-panel > * { position: relative; z-index: 1; }
+    .music-topline { display: flex; align-items: center; justify-content: space-between; gap: .75rem; color: #a7c9d9; font: 10px 'JetBrains Mono', monospace; letter-spacing: .14em; }
+    #site-music-title { margin: .7rem 0; color: #f3efe6; font-size: .95rem; font-weight: 700; overflow-wrap: anywhere; }
+    .music-progress-row { display: flex; gap: .55rem; align-items: center; color: #9bb0bc; font: 11px 'JetBrains Mono', monospace; }
+    .music-range { min-width: 0; accent-color: #8ecde8; cursor: pointer; }
+    .music-progress-row input { flex: 1; }
+    .music-actions { display: flex; align-items: center; gap: .45rem; margin-top: .8rem; flex-wrap: wrap; }
+    .music-actions button { border: 1px solid rgba(142,205,232,.35); color: #c7e9f5; min-width: 34px; height: 34px; font-size: .8rem; background: rgba(5,19,26,.65); }
+    .music-actions .music-play { min-width: 42px; border-color: #f7a8b8; background: #f7a8b8; color: #071820; font-weight: 700; }
+    .music-controls select { min-width: 0; max-width: 100%; background: #081e28; color: #c7e9f5; border: 1px solid rgba(142,205,232,.3); padding: .45rem; font-size: .75rem; }
+    .music-selection { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: .5rem; margin-top: .75rem; }
+    .music-volume { display: flex; align-items: center; gap: .4rem; color: #9bb0bc; font-size: .7rem; margin-left: auto; }
+    .music-volume input { width: 65px; }
+    #music-controls[hidden], #site-music-audio[hidden] { display: none !important; }
     .project-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
     .project-card { min-width: 0; background: rgba(9,31,43,.9); border: 1px solid rgba(142,205,232,.25); padding: 1.2rem; transition: transform .25s ease, border-color .25s ease; }
     .project-card:hover { transform: translateY(-3px); border-color: #f7a8b8; }
@@ -422,6 +438,10 @@
     body:not(.admin-mode) #articleModal button[onclick="deleteCurrentArticle()"],
     body:not(.admin-mode) button[onclick="promptAddFriendLink()"],
     body:not(.admin-mode) .owner-action { display: none !important; }
+    #nav-cloudflare, #nav-settings, #mobileNavMenu button[onclick*="cloudflare"], #mobileNavMenu button[onclick*="settings"] { display: none !important; }
+    .owner-quick-menu { position: fixed; right: 1rem; bottom: 1rem; z-index: 25; }
+    .owner-quick-menu button { display: block; width: 100%; padding: .55rem .8rem; text-align: left; font-size: .75rem; color: #c7e9f5; background: #081e28; border: 1px solid rgba(142,205,232,.4); }
+    .owner-quick-menu [hidden] { display: none !important; }
     header button[onclick="openComposeModal()"] { display: none !important; }
     header nav .nav-tab { background: transparent !important; border: 0 !important; border-bottom: 2px solid transparent !important; clip-path: none; color: #b7c5d0 !important; }
     header nav .nav-tab:hover { background: rgba(142,205,232,.08) !important; }
@@ -1592,7 +1612,7 @@
       <!-- Modal Scrollable Body -->
       <div id="articleModalScroll" onscroll="updateReadingProgress()" class="p-6 sm:p-10 overflow-y-auto space-y-6 flex-1">
         <div class="space-y-3 border-b-2 border-cyan-500/25 pb-6 relative">
-          <div class="font-mono text-[10px] tracking-[0.3em] text-[#F7A8B8] uppercase">LATERANO EDITORIAL ARCHIVE // 深度构成研究</div>
+          <div id="article-eyebrow" class="font-mono text-[10px] tracking-[0.3em] text-[#F7A8B8] uppercase">LATERANO EDITORIAL ARCHIVE // 深度构成研究</div>
           <h2 id="modalPostTitle" class="font-serif text-2xl sm:text-4xl font-black text-[#F3EFE6] leading-tight"></h2>
           <div class="flex flex-wrap items-center gap-4 text-xs font-mono text-slate-400 pt-1">
             <span id="modalPostDate"></span>
@@ -1664,6 +1684,10 @@
         <div>
           <label class="block font-mono text-xs text-cyan-300 mb-1">TITLE // 行记标题</label>
           <input id="newPostTitle" type="text" placeholder="例如：论《一个圆的100种死法》与拉特兰星盘几何构成" class="w-full px-3 py-2 text-sm bg-slate-950 border border-cyan-500/40 text-white focus:outline-none focus:border-[#F7A8B8]" />
+        </div>
+        <div>
+          <label for="newPostDisplayCode" class="block font-mono text-xs text-cyan-300 mb-1">文章编号（选填）</label>
+          <input id="newPostDisplayCode" type="text" maxlength="40" placeholder="例如：RF-001；留空时自动生成" class="w-full px-3 py-2 text-sm bg-slate-950 border border-cyan-500/40 text-white focus:outline-none focus:border-[#F7A8B8]" />
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -3087,6 +3111,7 @@
       appState.editingPostId = editPostId;
       const modal = document.getElementById('composeModal');
       const titleInput = document.getElementById('newPostTitle');
+      const displayCodeInput = document.getElementById('newPostDisplayCode');
       const catSelect = document.getElementById('newPostCategory');
       const tagsInput = document.getElementById('newPostTags');
       const sumInput = document.getElementById('newPostSummary');
@@ -3097,6 +3122,7 @@
         const post = appState.posts.find(p => p.id === editPostId);
         if (post) {
           titleInput.value = post.title;
+          displayCodeInput.value = post.code || '';
           catSelect.value = post.category;
           tagsInput.value = (post.tags || []).join(', ');
           sumInput.value = post.summary || '';
@@ -3105,6 +3131,7 @@
         }
       } else {
         titleInput.value = '';
+        displayCodeInput.value = '';
         catSelect.value = '';
         tagsInput.value = '';
         sumInput.value = '';
@@ -3151,6 +3178,7 @@
 
     window.publishNewPost = function() {
       const title = document.getElementById('newPostTitle').value.trim();
+      const displayCode = document.getElementById('newPostDisplayCode').value.trim();
       const category = document.getElementById('newPostCategory').value.trim() || '未分类';
       const tagsRaw = document.getElementById('newPostTags').value.trim();
       const summary = document.getElementById('newPostSummary').value.trim();
@@ -3162,6 +3190,9 @@
         showToast('请填写行记标题与正文内容！', 'orange');
         return;
       }
+      if (displayCode && !/^[\p{L}\p{N} _.-]{1,40}$/u.test(displayCode)) {
+        showToast('文章编号可使用文字、数字、空格、点、横线和下划线', 'orange'); return;
+      }
 
       playSound('chime');
       const tags = tagsRaw ? tagsRaw.split(/[,，]/).map(t => t.trim()).filter(Boolean) : ['平面构成', '原创行记'];
@@ -3172,6 +3203,7 @@
         const existing = appState.posts.find(p => p.id === appState.editingPostId);
         if (existing) {
           existing.title = title;
+          if (displayCode) existing.code = displayCode;
           existing.category = category;
           existing.tags = tags;
           existing.summary = cleanSummary;
@@ -3192,7 +3224,7 @@
       const todayStr = new Date().toISOString().slice(0, 10);
       const newPost = {
         id: 'post-' + Date.now(),
-        code: 'LAT-USR-' + String(newIndex).padStart(2, '0'),
+        code: displayCode || 'LAT-USR-' + String(newIndex).padStart(2, '0'),
         issueNo: String(newIndex).padStart(2, '0'),
         latinSub: 'NOVA ARCHIVA // ORIGINAL',
         title,
@@ -4353,7 +4385,7 @@ id = "在此填入你的_CLOUDFLARE_KV_NAMESPACE_ID"
 
 <script id="simple-blog-interface">
 const siteSettingsKey = 'simple_blog_site_settings_v1';
-const defaultSiteSettings = { name:'众生行记', badge:'平面构成', headerSubtitle:'Geometric Planar Art // Editorial', introEnglish:'THE MASSES’ TRAVELS', description:'记录想法、设计与生活。欢迎在这里慢慢阅读。', sectionEnglish:'LATEST POSTS', sectionTitle:'最新文章', aboutTitle:'关于我', aboutSubtitle:'平面构成研究者 · 游戏 UI/UX 与动效工程师', aboutDescription:'', startDate:'', musicTitle:'', musicUrl:'', musicPlaylist:'', locationLabel:'', githubUrl:'' };
+const defaultSiteSettings = { name:'众生行记', badge:'平面构成', headerSubtitle:'Geometric Planar Art // Editorial', introEnglish:'THE MASSES’ TRAVELS', description:'记录想法、设计与生活。欢迎在这里慢慢阅读。', sectionEnglish:'LATEST POSTS', sectionTitle:'最新文章', articleEyebrow:'LATERANO EDITORIAL ARCHIVE // 深度构成研究', aboutTitle:'关于我', aboutSubtitle:'平面构成研究者 · 游戏 UI/UX 与动效工程师', aboutDescription:'', startDate:'', musicTitle:'', musicUrl:'', musicPlaylist:'', locationLabel:'', githubUrl:'' };
 function readSiteSettings() {
   try { return { ...defaultSiteSettings, ...JSON.parse(localStorage.getItem(siteSettingsKey) || '{}') }; }
   catch (_) { return { ...defaultSiteSettings }; }
@@ -4398,6 +4430,10 @@ let musicTracks = [];
 let musicIndex = -1;
 let musicSignature = '';
 let musicDefaultPlaylist = '';
+let musicHistory = [];
+let musicHistoryPosition = -1;
+let musicMode = 'sequence';
+try { const saved = localStorage.getItem('simple_blog_music_mode'); if (['sequence','shuffle','repeat'].includes(saved)) musicMode = saved; } catch (_) {}
 function parseMusicPlaylist(settings) {
   const lines = (settings.musicPlaylist || '').split(/\r?\n/).map(line => line.trim()).filter(Boolean);
   if (!lines.length && settings.musicUrl) lines.push((settings.musicTitle || '音乐') + ' | ' + settings.musicUrl);
@@ -4412,16 +4448,29 @@ function parseMusicPlaylist(settings) {
     } catch (_) { return null; }
   });
 }
-function chooseMusic(play) {
+function playMusicTrack(index, play, record = true) {
   const audio = document.getElementById('site-music-audio');
-  if (!audio || !musicTracks.length) return;
-  let next = Math.floor(Math.random() * musicTracks.length);
-  if (musicTracks.length > 1 && next === musicIndex) next = (next + 1 + Math.floor(Math.random() * (musicTracks.length - 1))) % musicTracks.length;
-  musicIndex = next;
-  const track = musicTracks[next]; audio.src = track.url; audio.setAttribute('data-url', track.url);
+  if (!audio || !musicTracks[index]) return;
+  musicIndex = index;
+  if (record) { musicHistory = musicHistory.slice(0, musicHistoryPosition + 1); musicHistory.push(index); musicHistoryPosition = musicHistory.length - 1; }
+  const track = musicTracks[index]; audio.src = track.url; audio.setAttribute('data-url', track.url);
   document.getElementById('site-music-title').textContent = '♫ ' + track.name;
-  document.getElementById('site-music-status').textContent = '随机播放 · 共 ' + musicTracks.length + ' 首';
-  if (play) audio.play().catch(() => { document.getElementById('site-music-status').textContent = '请点击播放器开始播放。'; });
+  const list = document.getElementById('music-track-select'); if (list) list.value = String(index);
+  const progress = document.getElementById('music-progress'); if (progress) progress.value = 0;
+  const elapsed = document.getElementById('music-elapsed'); if (elapsed) elapsed.textContent = '0:00';
+  const duration = document.getElementById('music-duration'); if (duration) duration.textContent = '0:00';
+  document.getElementById('site-music-status').textContent = '共 ' + musicTracks.length + ' 首';
+  if (play) audio.play().catch(() => { document.getElementById('site-music-status').textContent = '浏览器限制自动播放，请点击播放按钮。'; });
+}
+function chooseMusic(play, direction = 1) {
+  if (!musicTracks.length) return;
+  if (direction < 0 && musicHistoryPosition > 0) { musicHistoryPosition--; playMusicTrack(musicHistory[musicHistoryPosition], play, false); return; }
+  if (direction > 0 && musicHistoryPosition < musicHistory.length - 1) { musicHistoryPosition++; playMusicTrack(musicHistory[musicHistoryPosition], play, false); return; }
+  let next = (musicIndex + direction + musicTracks.length) % musicTracks.length;
+  if (direction > 0 && musicMode === 'shuffle' && musicTracks.length > 1) {
+    next = (musicIndex + 1 + Math.floor(Math.random() * (musicTracks.length - 1))) % musicTracks.length;
+  }
+  playMusicTrack(next, play);
 }
 function renderSocialLinks() {
   const grid = document.getElementById('social-links-list');
@@ -4466,6 +4515,7 @@ function applySiteSettings(settings) {
   set('#sec-resting h2', settings.aboutTitle);
   set('#aboutSubtitle', settings.aboutSubtitle);
   set('#aboutDescription', settings.aboutDescription);
+  set('#article-eyebrow', settings.articleEyebrow);
   const locationCard = document.getElementById('home-location');
   if (locationCard) { locationCard.hidden = !settings.locationLabel; set('#home-location-value', settings.locationLabel); }
   const githubUrl = githubProfileUrl(settings.githubUrl);
@@ -4485,12 +4535,14 @@ function applySiteSettings(settings) {
     const tracks = parseMusicPlaylist(effective).filter(Boolean);
     const signature = JSON.stringify(tracks);
     if (signature !== musicSignature) {
-      audio.pause(); musicTracks = tracks; musicIndex = -1; musicSignature = signature;
-      if (tracks.length) chooseMusic(false);
+      audio.pause(); musicTracks = tracks; musicIndex = -1; musicHistory = []; musicHistoryPosition = -1; musicSignature = signature;
+      const list = document.getElementById('music-track-select');
+      if (list) { list.replaceChildren(); tracks.forEach((track, index) => { const option = document.createElement('option'); option.value = index; option.textContent = track.name; list.append(option); }); }
+      if (tracks.length) playMusicTrack(musicMode === 'shuffle' ? Math.floor(Math.random() * tracks.length) : 0, true);
       else { audio.removeAttribute('src'); audio.removeAttribute('data-url'); audio.load(); musicTitle.textContent = '音乐播放器'; musicStatus.textContent = '在网站设置中添加歌单，即可播放。'; }
     }
-    audio.hidden = !tracks.length;
-    const shuffle = document.getElementById('site-music-next'); if (shuffle) shuffle.hidden = tracks.length === 0;
+    audio.hidden = true;
+    const controls = document.getElementById('music-controls'); if (controls) controls.hidden = tracks.length === 0;
   }
   document.title = settings.name + ' · 个人博客';
 }
@@ -4705,16 +4757,41 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('homePostsGrid').parentElement.after(document.getElementById('home-projects'));
   document.getElementById('home-projects').after(document.getElementById('site-home-extras'));
   document.getElementById('site-home-extras').after(document.getElementById('home-guestbook-link'));
-  document.getElementById('site-music-audio').addEventListener('error', () => {
-    document.getElementById('site-music-status').textContent = '音乐加载失败，请检查链接是否为可公开访问的音频直链。';
-  });
-  if (!document.getElementById('site-music-next')) {
-    const button = document.createElement('button'); button.id = 'site-music-next'; button.type = 'button'; button.hidden = true;
-    button.className = 'mt-2 px-3 py-1 text-xs text-cyan-300 border border-cyan-500/40'; button.textContent = '随机下一首 ↻';
-    document.getElementById('site-music-status').after(button);
+  const audio = document.getElementById('site-music-audio');
+  const musicPanel = audio.parentElement; musicPanel.classList.add('music-panel');
+  audio.removeAttribute('controls'); audio.hidden = true;
+  const oldNext = document.getElementById('site-music-next'); if (oldNext) oldNext.remove();
+  if (!document.getElementById('music-topline')) {
+    const topline = document.createElement('div'); topline.id = 'music-topline'; topline.className = 'music-topline';
+    topline.innerHTML = '<span>♫ &nbsp; MUSIC / 音乐</span><span>◌ &nbsp; ON AIR</span>';
+    musicPanel.prepend(topline);
   }
-  document.getElementById('site-music-next').addEventListener('click', () => chooseMusic(true));
-  document.getElementById('site-music-audio').addEventListener('ended', () => chooseMusic(true));
+  if (!document.getElementById('music-controls')) {
+    const controls = document.createElement('div'); controls.id = 'music-controls'; controls.className = 'music-controls'; controls.hidden = true;
+    controls.innerHTML = `<div class="music-progress-row"><span id="music-elapsed">0:00</span><input id="music-progress" class="music-range" type="range" min="0" max="1000" value="0" aria-label="播放进度"><span id="music-duration">0:00</span></div>
+      <div class="music-actions"><button type="button" id="music-prev" aria-label="上一首" title="上一首">|◀</button><button type="button" id="music-play" class="music-play" aria-label="播放">▶</button><button type="button" id="music-next" aria-label="下一首" title="下一首">▶|</button><label class="music-volume">音量 <input id="music-volume" class="music-range" type="range" min="0" max="1" step="0.01" value="0.7" aria-label="音量"></label></div>
+      <div class="music-selection"><select id="music-track-select" aria-label="选择歌曲"></select><select id="music-mode" aria-label="播放模式"><option value="sequence">顺序播放</option><option value="shuffle">随机播放</option><option value="repeat">单曲循环</option></select></div>`;
+    audio.after(controls);
+  }
+  const playButton = document.getElementById('music-play');
+  const progress = document.getElementById('music-progress');
+  const volume = document.getElementById('music-volume');
+  const mode = document.getElementById('music-mode');
+  const formatTime = seconds => { if (!Number.isFinite(seconds)) return '0:00'; const value = Math.floor(seconds); return Math.floor(value / 60) + ':' + String(value % 60).padStart(2, '0'); };
+  mode.value = musicMode; audio.volume = Number(volume.value);
+  playButton.onclick = () => { if (audio.paused) audio.play().catch(() => { document.getElementById('site-music-status').textContent = '无法播放，请检查音乐链接。'; }); else audio.pause(); };
+  document.getElementById('music-prev').onclick = () => chooseMusic(true, -1);
+  document.getElementById('music-next').onclick = () => chooseMusic(true, 1);
+  document.getElementById('music-track-select').onchange = event => playMusicTrack(Number(event.target.value), true);
+  mode.onchange = () => { musicMode = mode.value; try { localStorage.setItem('simple_blog_music_mode', musicMode); } catch (_) {} };
+  volume.oninput = () => { audio.volume = Number(volume.value); };
+  progress.oninput = () => { if (Number.isFinite(audio.duration)) audio.currentTime = Number(progress.value) / 1000 * audio.duration; };
+  audio.addEventListener('timeupdate', () => { document.getElementById('music-elapsed').textContent = formatTime(audio.currentTime); if (Number.isFinite(audio.duration) && audio.duration > 0) progress.value = Math.round(audio.currentTime / audio.duration * 1000); });
+  audio.addEventListener('loadedmetadata', () => { document.getElementById('music-duration').textContent = formatTime(audio.duration); });
+  audio.addEventListener('play', () => { playButton.textContent = '❚❚'; playButton.setAttribute('aria-label', '暂停'); document.getElementById('site-music-status').textContent = '正在播放 · 共 ' + musicTracks.length + ' 首'; });
+  audio.addEventListener('pause', () => { playButton.textContent = '▶'; playButton.setAttribute('aria-label', '播放'); });
+  audio.addEventListener('ended', () => { if (musicMode === 'repeat') playMusicTrack(musicIndex, true, false); else chooseMusic(true); });
+  audio.addEventListener('error', () => { document.getElementById('site-music-status').textContent = '音乐加载失败，请检查链接和浏览器格式支持。'; });
   if (!document.getElementById('simple-toolbar')) {
     const toolbar=document.createElement('div'); toolbar.id='simple-toolbar'; toolbar.className='simple-toolbar';
     toolbar.innerHTML='<h2>文章管理</h2><p>在这里写文章、管理已有文章和备份数据。文章先保存在当前浏览器；如需让其他人看到更新，请导出网页并重新部署。</p><div class="simple-actions"><button onclick="openComposeModal()">＋ 写文章</button><button onclick="triggerMarkdownImport()">导入 Markdown</button><button onclick="exportPostsJson()">导出数据备份</button><button onclick="triggerJsonImport()">恢复数据备份</button><button onclick="exportBakedIndexHtml()">导出网站文件</button></div>';
@@ -4769,6 +4846,16 @@ window.addEventListener('DOMContentLoaded', () => {
     switchSection('sanctuary');
     if (location.hash === '#rongfu') { try { history.replaceState(null, '', location.pathname + location.search); } catch (_) { location.hash = ''; } }
   };
+  if (!document.getElementById('owner-quick-menu')) {
+    const menu = document.createElement('div'); menu.id = 'owner-quick-menu'; menu.className = 'owner-action owner-quick-menu';
+    menu.innerHTML = `<div id="owner-quick-options" hidden><button type="button" data-owner-page="cloudflare">文章管理</button><button type="button" data-owner-page="settings">网站设置</button><button type="button" id="owner-quick-exit">退出站长模式</button></div><button type="button" id="owner-quick-toggle" aria-expanded="false">⚙ 站长管理</button>`;
+    document.body.append(menu);
+  }
+  const ownerOptions = document.getElementById('owner-quick-options'); ownerOptions.hidden = true;
+  const ownerToggle = document.getElementById('owner-quick-toggle'); ownerToggle.setAttribute('aria-expanded', 'false');
+  ownerToggle.onclick = () => { ownerOptions.hidden = !ownerOptions.hidden; ownerToggle.setAttribute('aria-expanded', String(!ownerOptions.hidden)); };
+  document.querySelectorAll('[data-owner-page]').forEach(button => button.onclick = () => { ownerOptions.hidden = true; ownerToggle.setAttribute('aria-expanded', 'false'); switchSection(button.dataset.ownerPage); });
+  document.getElementById('owner-quick-exit').onclick = () => { ownerOptions.hidden = true; document.getElementById('exit-admin-button').click(); };
   const settingsForm = document.getElementById('site-settings-form');
   if (!settingsForm.elements.startDate) {
     const fields = document.createElement('div'); fields.className = 'grid grid-cols-1 sm:grid-cols-2 gap-4 sm:col-span-2';
@@ -4790,6 +4877,11 @@ window.addEventListener('DOMContentLoaded', () => {
   if (!settingsForm.elements.musicPlaylist) {
     const label = document.createElement('label'); label.className = 'text-sm text-slate-300 sm:col-span-2';
     label.innerHTML = '随机播放歌单<textarea name="musicPlaylist" rows="5" maxlength="20000" placeholder="歌名 | https://example.com/music/song1.mp3&#10;另一首 | /music/song2.mp3" class="w-full mt-1 px-3 py-2 bg-slate-950 border border-cyan-500/40 text-white"></textarea><span class="block text-xs text-slate-400 mt-1">每行填写一首：歌名 | 音频文件地址。也可以只填地址；可用 /music/文件名 指向上传到网站的音乐。歌单留空时继续使用上面的单首音乐。</span>';
+    settingsForm.insertBefore(label, settingsForm.querySelector('.simple-actions'));
+  }
+  if (!settingsForm.elements.articleEyebrow) {
+    const label = document.createElement('label'); label.className = 'text-sm text-slate-300 sm:col-span-2';
+    label.innerHTML = '文章阅读页说明文字<input name="articleEyebrow" maxlength="120" placeholder="例如：我的文章 / 阅读记录" class="w-full mt-1 px-3 py-2 bg-slate-950 border border-cyan-500/40 text-white" /><span class="block text-xs text-slate-400 mt-1">显示在每篇文章标题上方，留空可以隐藏文字。</span>';
     settingsForm.insertBefore(label, settingsForm.querySelector('.simple-actions'));
   }
   const fillSettings = settings => { for (const key of Object.keys(defaultSiteSettings)) settingsForm.elements[key].value = settings[key]; };
