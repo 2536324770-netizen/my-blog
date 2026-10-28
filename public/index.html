@@ -4397,6 +4397,7 @@ function githubProfileUrl(value) {
 let musicTracks = [];
 let musicIndex = -1;
 let musicSignature = '';
+let musicDefaultPlaylist = '';
 function parseMusicPlaylist(settings) {
   const lines = (settings.musicPlaylist || '').split(/\r?\n/).map(line => line.trim()).filter(Boolean);
   if (!lines.length && settings.musicUrl) lines.push((settings.musicTitle || '音乐') + ' | ' + settings.musicUrl);
@@ -4478,7 +4479,10 @@ function applySiteSettings(settings) {
   const musicStatus = document.getElementById('site-music-status');
   const musicTitle = document.getElementById('site-music-title');
   if (audio && musicStatus && musicTitle) {
-    const tracks = parseMusicPlaylist(settings).filter(Boolean);
+    const effective = !settings.musicPlaylist && musicDefaultPlaylist
+      ? { ...settings, musicPlaylist: musicDefaultPlaylist + (settings.musicUrl ? '\n' + (settings.musicTitle || '音乐').replace(/[|\r\n]/g, ' ') + ' | ' + settings.musicUrl : '') }
+      : settings;
+    const tracks = parseMusicPlaylist(effective).filter(Boolean);
     const signature = JSON.stringify(tracks);
     if (signature !== musicSignature) {
       audio.pause(); musicTracks = tracks; musicIndex = -1; musicSignature = signature;
@@ -4790,6 +4794,14 @@ window.addEventListener('DOMContentLoaded', () => {
   }
   const fillSettings = settings => { for (const key of Object.keys(defaultSiteSettings)) settingsForm.elements[key].value = settings[key]; };
   const settings = readSiteSettings(); fillSettings(settings); applySiteSettings(settings);
+  fetch('/music/playlist.json', { cache: 'no-cache' }).then(response => {
+    if (!response.ok) throw new Error('no default playlist');
+    return response.json();
+  }).then(tracks => {
+    if (!Array.isArray(tracks)) return;
+    musicDefaultPlaylist = tracks.filter(track => typeof track.name === 'string' && typeof track.url === 'string').map(track => track.name.replace(/[|\r\n]/g, ' ') + ' | ' + track.url).join('\n');
+    applySiteSettings(readSiteSettings());
+  }).catch(() => {});
   setInterval(() => updateSiteRuntime(readSiteSettings().startDate), 60000);
   settingsForm.addEventListener('submit', event => {
     event.preventDefault();
