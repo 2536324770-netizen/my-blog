@@ -2835,7 +2835,7 @@
         `;
       }
 
-      saveStateToLocalStorage();
+      saveStateToLocalStorage(false);
       updateModalButtons(post);
       renderArticleComments(post);
 
@@ -3235,7 +3235,7 @@
           renderArchiveSection();
           renderCmsDashboard();
           closeComposeModal();
-          showToast('文章修改已保存并自动持久化至本地存储！', 'cyan');
+          showToast('文章已保存，正在同步云端', 'cyan');
           return;
         }
       }
@@ -3273,13 +3273,13 @@
       unlockMedal('medal-5');
 
       closeComposeModal();
-      showToast('新行记已归档发布！你可前往「06 ☁️ CF部署与CMS」一键导出部署网页', 'cyan');
+      showToast('文章已保存，正在同步云端', 'cyan');
     };
 
     // --- 8B. LOCALSTORAGE PERSISTENCE, CLOUDFLARE PAGES BAKE, MARKDOWN I/O & RSS ---
     const STORAGE_KEY = 'laterano_blog_cms_v2';
 
-    function saveStateToLocalStorage() {
+    function saveStateToLocalStorage(syncCloud = true) {
       try {
         const payload = {
           posts: appState.posts,
@@ -3295,6 +3295,7 @@
         if (badge) {
           badge.textContent = `● LOCAL-CMS: 已自动保存 (${(raw.length / 1024).toFixed(1)} KB)`;
         }
+        if (syncCloud && window.queueCloudContentSave) window.queueCloudContentSave();
       } catch (e) {}
     }
 
@@ -3303,7 +3304,7 @@
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return;
         const data = JSON.parse(raw);
-        if (Array.isArray(data.posts) && data.posts.length > 0) appState.posts = data.posts;
+        if (Array.isArray(data.posts)) appState.posts = data.posts;
         if (Array.isArray(data.confessions)) appState.confessions = data.confessions;
         if (Array.isArray(data.friendLinks)) appState.friendLinks = data.friendLinks;
         if (typeof data.tokens === 'number') appState.tokens = data.tokens;
@@ -4400,9 +4401,7 @@ id = "在此填入你的_CLOUDFLARE_KV_NAMESPACE_ID"
         const navigation = performance.getEntriesByType?.('navigation')?.[0];
         const wasReload = navigation ? navigation.type === 'reload' : performance.navigation?.type === 1;
         try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch (_) {}
-        if (!wasReload && appState.posts.some(p => p.id === targetId)) {
-          setTimeout(() => openArticle(targetId), 200);
-        }
+        if (!wasReload) window.pendingArticleId = targetId;
       }
     });
   </script>
@@ -4572,14 +4571,9 @@ function applySiteSettings(settings) {
 }
 window.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('#composeModal, #articleModal, #friendLinkForm, #social-form, #project-form').forEach(element => element.classList.add('hidden'));
-  let adminMode = location.hash === '#rongfu';
-  let hadAdminSession = false;
-  try {
-    hadAdminSession = sessionStorage.getItem('simple_blog_admin') === '1';
-    if (adminMode) sessionStorage.setItem('simple_blog_admin', '1');
-    else adminMode = hadAdminSession;
-  } catch (_) {}
-  document.body.classList.toggle('admin-mode', adminMode);
+  const adminMode = false;
+  document.body.classList.remove('admin-mode');
+  try { sessionStorage.removeItem('simple_blog_admin'); } catch (_) {}
   const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
   window.addEventListener('pointermove', event => {
     if (event.pointerType === 'touch' || motionPreference.matches) return;
@@ -4713,7 +4707,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (!links[index]) return;
     if (button.dataset.socialAction === 'edit') openSocialForm(index);
     if (button.dataset.socialAction === 'delete' && confirm('确定删除这个社交平台链接吗？')) {
-      try { links.splice(index, 1); localStorage.setItem('simple_blog_social_v1', JSON.stringify(links)); socialForm.classList.add('hidden'); renderSocialLinks(); }
+      try { links.splice(index, 1); localStorage.setItem('simple_blog_social_v1', JSON.stringify(links)); if (window.queueCloudContentSave) window.queueCloudContentSave(); socialForm.classList.add('hidden'); renderSocialLinks(); }
       catch (_) { showToast('保存失败，请检查浏览器存储设置', 'orange'); }
     }
   };
@@ -4723,7 +4717,7 @@ window.addEventListener('DOMContentLoaded', () => {
     catch (_) { showToast('请输入平台名称和有效的 http 或 https 网址', 'orange'); return; }
     const links = readSocialLinks(); const item = { name, url: url.href };
     if (socialEditIndex === null) links.push(item); else links[socialEditIndex] = item;
-    try { localStorage.setItem('simple_blog_social_v1', JSON.stringify(links)); socialForm.classList.add('hidden'); renderSocialLinks(); showToast('社交链接已保存', 'cyan'); }
+    try { localStorage.setItem('simple_blog_social_v1', JSON.stringify(links)); if (window.queueCloudContentSave) window.queueCloudContentSave(); socialForm.classList.add('hidden'); renderSocialLinks(); showToast('社交链接已保存', 'cyan'); }
     catch (_) { showToast('保存失败，请检查浏览器存储设置', 'orange'); }
   };
   renderSocialLinks();
@@ -4762,7 +4756,7 @@ window.addEventListener('DOMContentLoaded', () => {
   window.editProject = index => openProjectEditor(index);
   window.deleteProject = index => {
     const projects = readProjects(); if (!projects[index] || !confirm('确定删除这个项目吗？')) return;
-    try { projects.splice(index, 1); localStorage.setItem('simple_blog_projects_v1', JSON.stringify(projects)); projectForm.classList.add('hidden'); renderProjects(); }
+    try { projects.splice(index, 1); localStorage.setItem('simple_blog_projects_v1', JSON.stringify(projects)); if (window.queueCloudContentSave) window.queueCloudContentSave(); projectForm.classList.add('hidden'); renderProjects(); }
     catch (_) { showToast('保存失败，请检查浏览器存储设置', 'orange'); }
   };
   projectForm.onsubmit = event => {
@@ -4770,7 +4764,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (!name || !url) { showToast('请输入项目名称和有效的 GitHub 地址', 'orange'); return; }
     const projects = readProjects(); const item = {name, url, description: projectForm.elements.projectDescription.value.trim()};
     if (projectEditIndex === null) projects.push(item); else projects[projectEditIndex] = item;
-    try { localStorage.setItem('simple_blog_projects_v1', JSON.stringify(projects)); projectForm.classList.add('hidden'); renderProjects(); showToast('项目已保存', 'cyan'); }
+    try { localStorage.setItem('simple_blog_projects_v1', JSON.stringify(projects)); if (window.queueCloudContentSave) window.queueCloudContentSave(); projectForm.classList.add('hidden'); renderProjects(); showToast('项目已保存', 'cyan'); }
     catch (_) { showToast('保存失败，请检查浏览器存储设置', 'orange'); }
   };
   renderProjects();
@@ -4824,6 +4818,8 @@ window.addEventListener('DOMContentLoaded', () => {
     toolbar.innerHTML='<h2>文章管理</h2><p>在这里写文章、管理已有文章和备份数据。文章先保存在当前浏览器；如需让其他人看到更新，请导出网页并重新部署。</p><div class="simple-actions"><button onclick="openComposeModal()">＋ 写文章</button><button onclick="triggerMarkdownImport()">导入 Markdown</button><button onclick="exportPostsJson()">导出数据备份</button><button onclick="triggerJsonImport()">恢复数据备份</button><button onclick="exportBakedIndexHtml()">导出网站文件</button></div>';
     document.getElementById('sec-cloudflare').prepend(toolbar);
   }
+  const managerDescription = document.querySelector('#simple-toolbar > p');
+  if (managerDescription) managerDescription.textContent = '文章、项目和网站设置由云端统一保存；下方会显示同步状态。';
   if (!document.getElementById('site-settings-panel')) {
     const panel = document.createElement('section'); panel.id = 'site-settings-panel'; panel.className = 'simple-toolbar';
     panel.innerHTML = `<h2>网站文字设置</h2><p>修改首页和顶部显示的文字，保存后立即生效。</p>
@@ -4867,7 +4863,7 @@ window.addEventListener('DOMContentLoaded', () => {
     button.textContent = '退出站长模式'; settingsSection.append(button);
   }
   document.getElementById('exit-admin-button').onclick = () => {
-    try { sessionStorage.removeItem('simple_blog_admin'); } catch (_) {}
+    if (window.endOwnerAccess) window.endOwnerAccess();
     document.body.classList.remove('admin-mode');
     document.getElementById('friendLinkForm').classList.add('hidden');
     switchSection('sanctuary');
@@ -4884,6 +4880,8 @@ window.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-owner-page]').forEach(button => button.onclick = () => { ownerOptions.hidden = true; ownerToggle.setAttribute('aria-expanded', 'false'); switchSection(button.dataset.ownerPage); });
   document.getElementById('owner-quick-exit').onclick = () => { ownerOptions.hidden = true; document.getElementById('exit-admin-button').click(); };
   const settingsForm = document.getElementById('site-settings-form');
+  const settingsNote = settingsForm.querySelector(':scope > p:last-child');
+  if (settingsNote) settingsNote.textContent = '保存后将同步到云端；可以使用文章管理中的备份功能保留副本。';
   if (!settingsForm.elements.startDate) {
     const fields = document.createElement('div'); fields.className = 'grid grid-cols-1 sm:grid-cols-2 gap-4 sm:col-span-2';
     fields.innerHTML = `<label class="text-sm text-slate-300">建站日期<input name="startDate" type="date" class="w-full mt-1 px-3 py-2 bg-slate-950 border border-cyan-500/40 text-white" /></label>
@@ -4912,6 +4910,7 @@ window.addEventListener('DOMContentLoaded', () => {
     settingsForm.insertBefore(label, settingsForm.querySelector('.simple-actions'));
   }
   const fillSettings = settings => { for (const key of Object.keys(defaultSiteSettings)) settingsForm.elements[key].value = settings[key]; };
+  window.refreshSiteSettingsForm = fillSettings;
   const settings = readSiteSettings(); fillSettings(settings); applySiteSettings(settings);
   fetch('/music/playlist.json', { cache: 'no-cache' }).then(response => {
     if (!response.ok) throw new Error('no default playlist');
@@ -4932,7 +4931,7 @@ window.addEventListener('DOMContentLoaded', () => {
       try { const url = new URL(updated.musicUrl); if (!['http:', 'https:'].includes(url.protocol)) throw new Error('invalid'); }
       catch (_) { showToast('请输入以 http 或 https 开头的音乐文件地址', 'orange'); return; }
     }
-    try { localStorage.setItem(siteSettingsKey, JSON.stringify(updated)); applySiteSettings(updated); showToast('网站文字已保存', 'cyan'); }
+    try { localStorage.setItem(siteSettingsKey, JSON.stringify(updated)); if (window.queueCloudContentSave) window.queueCloudContentSave(); applySiteSettings(updated); showToast('网站文字已保存', 'cyan'); }
     catch (_) { showToast('保存失败，请检查浏览器存储设置', 'orange'); }
   });
   document.getElementById('site-settings-reset').addEventListener('click', () => {
@@ -4955,12 +4954,12 @@ window.addEventListener('DOMContentLoaded', () => {
     if(key==='cloudflare') renderCmsDashboard();
     window.scrollTo({top:0, behavior:'auto'});
   };
-  function enterOwnerMode(openSettings = true) {
-    document.body.classList.add('admin-mode');
-    try { sessionStorage.setItem('simple_blog_admin', '1'); } catch (_) {}
+  async function enterOwnerMode(openSettings = true) {
     if (location.hash === '#rongfu') {
       try { history.replaceState(null, '', location.pathname + location.search); } catch (_) { location.hash = ''; }
     }
+    if (!window.requestOwnerAccess || !await window.requestOwnerAccess()) return;
+    document.body.classList.add('admin-mode');
     if (openSettings) { switchSection('settings'); showToast('已进入站长模式', 'cyan'); }
   }
   window.addEventListener('hashchange', () => {
@@ -4970,7 +4969,7 @@ window.addEventListener('DOMContentLoaded', () => {
   if (initialNav) initialNav.setAttribute('aria-current', 'page');
   const initialMobileNav = document.querySelector(`#mobileNavMenu button[onclick="switchSection('${appState.currentSection}')"]`);
   if (initialMobileNav) initialMobileNav.setAttribute('aria-current', 'page');
-  if (location.hash === '#rongfu') enterOwnerMode(!hadAdminSession);
+  if (location.hash === '#rongfu') enterOwnerMode();
   if (!adminMode && !['sanctuary', 'audience', 'resting', 'guestbook', 'projects'].includes(appState.currentSection)) switchSection('sanctuary');
   if ('IntersectionObserver' in window && !motionPreference.matches) {
     const observer = new IntersectionObserver(entries => {
@@ -4988,6 +4987,140 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+</script>
+<script id="cloud-content-client">
+(() => {
+  let password = '';
+  let revision = 0;
+  let initialized = false;
+  let applying = false;
+  let dirty = false;
+  let saving = false;
+  let blocked = false;
+  let conflict = false;
+  let timer = null;
+  let initialLoad = null;
+  const backupPrefix = 'simple_blog_cloud_backup_';
+
+  function snapshot() {
+    return JSON.parse(JSON.stringify({ posts: appState.posts, friendLinks: appState.friendLinks, projects: readProjects(), socialLinks: readSocialLinks(), siteSettings: readSiteSettings() }));
+  }
+  function meaningful(data) {
+    return JSON.stringify({ ...data, posts: (data.posts || []).map(post => {
+      const copy = { ...post }; delete copy.views; delete copy.likes; delete copy.liked; delete copy.bookmarked; delete copy.comments; return copy;
+    }) });
+  }
+  function status(message, error = false) {
+    document.querySelectorAll('.cloud-content-status').forEach(element => { element.textContent = message; element.style.color = error ? '#fda4af' : '#a5d9ed'; });
+  }
+  async function api(path, method = 'GET', body, secret = '') {
+    const headers = {}; if (body) headers['Content-Type'] = 'application/json';
+    if (secret) headers['X-Guestbook-Password'] = secret;
+    const response = await fetch(path, { method, headers, body: body ? JSON.stringify(body) : undefined, cache: 'no-store', credentials: 'same-origin' });
+    let result; try { result = await response.json(); } catch (_) { throw new Error('无法连接云端服务'); }
+    if (!response.ok) { const error = new Error(result.error || '云端操作失败'); error.status = response.status; throw error; }
+    return result;
+  }
+  function applyCloud(data) {
+    if (!data || !Array.isArray(data.posts) || !Array.isArray(data.friendLinks) || !Array.isArray(data.projects) || !Array.isArray(data.socialLinks) || !data.siteSettings || typeof data.siteSettings !== 'object') throw new Error('云端数据格式不正确');
+    const before = snapshot();
+    if (meaningful(before) !== meaningful(data)) {
+      const backup = { exportedAt: new Date().toISOString(), ...before };
+      localStorage.setItem(backupPrefix + Date.now(), JSON.stringify(backup));
+    }
+    applying = true;
+    try {
+      let local = {}; try { local = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch (_) {}
+      local.posts = data.posts; local.friendLinks = data.friendLinks;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(local));
+      localStorage.setItem(siteSettingsKey, JSON.stringify(data.siteSettings));
+      localStorage.setItem('simple_blog_projects_v1', JSON.stringify(data.projects));
+      localStorage.setItem('simple_blog_social_v1', JSON.stringify(data.socialLinks));
+      appState.posts = data.posts; appState.friendLinks = data.friendLinks;
+      renderHomePosts(); renderArchiveSection(); renderFriendLinks(); renderProjects(); renderSocialLinks(); renderCmsDashboard();
+      const settings = readSiteSettings(); applySiteSettings(settings); if (window.refreshSiteSettingsForm) window.refreshSiteSettingsForm(settings);
+    } finally { applying = false; }
+  }
+  async function loadCloud() {
+    const result = await api('/api/site-content');
+    if (result.initialized) { applyCloud(result.data); revision = result.revision; initialized = true; status('云端内容已同步'); }
+    else { revision = 0; initialized = false; status('云端尚未初始化：站长登录后可发布当前浏览器内容', true); }
+  }
+  function ensureInitialLoad() {
+    if (!initialLoad) initialLoad = loadCloud().catch(error => { status('云端暂不可用，暂不允许发布', true); initialLoad = null; throw error; });
+    return initialLoad;
+  }
+  async function flush() {
+    if (saving || !dirty || !password || !initialized || blocked) return;
+    saving = true;
+    try {
+      while (dirty && password && !blocked) {
+        dirty = false; status('正在保存到云端…');
+        const result = await api('/api/site-content', 'PUT', { revision, data: snapshot() }, password);
+        revision = result.revision;
+      }
+      status('已保存到云端');
+    } catch (error) {
+      dirty = true; blocked = true; conflict = error.status === 409;
+      status(conflict ? '云端内容已变化，本地修改未发布；请先导出备份' : '云端保存失败，修改仍在本机；请重试', true);
+      showToast(conflict ? '云端有其他更新，请先导出备份' : '云端保存失败，本机内容仍保留', 'orange');
+    } finally { saving = false; }
+  }
+  window.queueCloudContentSave = () => {
+    if (!password || applying || !initialized) return;
+    dirty = true; status('等待保存到云端…');
+    if (blocked) return;
+    clearTimeout(timer); timer = setTimeout(flush, 500);
+  };
+  window.endOwnerAccess = () => { if (dirty || saving) showToast('还有未完成的云端保存，请检查状态', 'orange'); password = ''; };
+  function askOwnerPassword() {
+    return new Promise(resolve => {
+      const overlay = document.createElement('div'); overlay.className = 'fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/90';
+      overlay.innerHTML = `<form class="ak-panel w-full max-w-sm p-6 space-y-4" role="dialog" aria-modal="true" aria-labelledby="owner-login-title"><h2 id="owner-login-title" class="font-serif text-xl text-[#F3EFE6]">站长登录</h2><p class="text-sm text-slate-300">请输入 Cloudflare 中设置的留言板管理密码。</p><label class="block text-xs text-cyan-300">站长密码<input type="password" autocomplete="current-password" required maxlength="256" class="block w-full mt-1 px-3 py-2 bg-slate-950 border border-cyan-500/40 text-white"></label><div class="flex gap-3 justify-end"><button type="button" class="cancel-owner px-4 py-2 text-xs border border-slate-600 text-slate-300">取消</button><button type="submit" class="px-4 py-2 text-xs bg-[#F7A8B8] text-slate-950">登录</button></div></form>`;
+      const form = overlay.querySelector('form'); const input = overlay.querySelector('input');
+      const finish = value => { overlay.remove(); resolve(value); };
+      form.onsubmit = event => { event.preventDefault(); finish(input.value); };
+      overlay.querySelector('.cancel-owner').onclick = () => finish(null);
+      overlay.onkeydown = event => { if (event.key === 'Escape') { event.stopPropagation(); finish(null); } };
+      document.body.append(overlay); input.focus();
+    });
+  }
+  window.requestOwnerAccess = async () => {
+    try { await ensureInitialLoad(); } catch (_) { showToast('云端不可用，请稍后重试', 'orange'); return false; }
+    const input = await askOwnerPassword();
+    if (input === null || !input) return false;
+    try {
+      await api('/api/site-auth', 'POST', {}, input);
+      if (!initialized) {
+        if (!confirm('云端还没有文章和网站设置。是否将当前浏览器里的文章、项目、友链和设置作为初始内容发布？')) return false;
+        const result = await api('/api/site-content', 'PUT', { revision: 0, data: snapshot() }, input);
+        revision = result.revision; initialized = true;
+      }
+      password = input; blocked = false; conflict = false; status('已连接云端，修改会自动保存'); return true;
+    } catch (error) { showToast(error.status === 401 ? '站长密码不正确' : '无法登录或初始化云端，请检查配置', 'orange'); return false; }
+  };
+  window.addEventListener('beforeunload', event => { if (dirty || saving) { event.preventDefault(); event.returnValue = ''; } });
+  window.addEventListener('DOMContentLoaded', () => {
+    ['simple-toolbar', 'site-settings-panel'].forEach(id => {
+      const panel = document.getElementById(id); if (!panel) return;
+      const bar = document.createElement('div'); bar.className = 'owner-action flex flex-wrap items-center gap-3 text-xs mt-3';
+      const label = document.createElement('span'); label.className = 'cloud-content-status'; label.textContent = '正在连接云端…';
+      const retry = document.createElement('button'); retry.type = 'button'; retry.className = 'text-cyan-300 underline'; retry.textContent = '重试保存';
+      retry.onclick = () => { if (!password || !dirty) return; if (conflict) { showToast('其他设备修改了内容，请先导出备份，刷新后重新编辑', 'orange'); return; } blocked = false; flush(); };
+      const backup = document.createElement('button'); backup.type = 'button'; backup.className = 'text-cyan-300 underline'; backup.textContent = '导出迁移前备份';
+      backup.onclick = () => {
+        const keys = Object.keys(localStorage).filter(key => key.startsWith(backupPrefix)).sort();
+        if (!keys.length) { showToast('没有迁移前备份', 'orange'); return; }
+        triggerBrowserDownload('blog-before-cloud.json', localStorage.getItem(keys[keys.length - 1]), 'application/json;charset=utf-8');
+      };
+      bar.append(label, retry, backup); panel.append(bar);
+    });
+    ensureInitialLoad().catch(() => {}).finally(() => {
+      if (window.pendingArticleId && appState.posts.some(post => post.id === window.pendingArticleId)) openArticle(window.pendingArticleId);
+      window.pendingArticleId = null;
+    });
+  });
+})();
 </script>
 <script id="shared-guestbook-client">
 window.addEventListener('DOMContentLoaded', () => {

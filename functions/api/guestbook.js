@@ -10,7 +10,7 @@ function sameOrigin(request) {
   try { return new URL(origin).origin === new URL(request.url).origin; } catch { return false; }
 }
 
-async function adminAuthorized(request, env) {
+export async function adminAuthorized(request, env) {
   const expected = env.GUESTBOOK_ADMIN_PASSWORD;
   const supplied = request.headers.get('X-Guestbook-Password');
   if (!expected || !supplied || supplied.length > 256) return false;
@@ -22,7 +22,7 @@ async function adminAuthorized(request, env) {
   return difference === 0;
 }
 
-async function clientKey(request, purpose) {
+export async function clientKey(request, purpose) {
   const ip = request.headers.get('CF-Connecting-IP');
   if (!ip) return null;
   const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(purpose + ':' + ip)));

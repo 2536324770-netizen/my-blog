@@ -17,3 +17,10 @@ CREATE TABLE IF NOT EXISTS guestbook_admin_attempts (
   window_start INTEGER NOT NULL,
   attempts INTEGER NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS site_content (
+  id INTEGER PRIMARY KEY CHECK (id = 1),
+  revision INTEGER NOT NULL,
+  content TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
