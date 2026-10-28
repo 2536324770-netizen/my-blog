@@ -372,7 +372,7 @@
     .feature-post { align-self: start; min-width: 0; }
     .feature-post-content { display: grid; grid-template-columns: minmax(0, 150px) minmax(0, 1fr); gap: 1.5rem; align-items: start; }
     .feature-post-number { min-width: 0; border-right: 1px solid rgba(5,19,26,.18); padding-right: 1rem; }
-    .feature-number { font-size: clamp(1.65rem, 3vw, 2.7rem); white-space: nowrap; }
+    .feature-number { font-size: clamp(1.65rem, 3vw, 2.7rem); overflow-wrap: anywhere; }
     .feature-post-copy { min-width: 0; }
     .feature-post-copy h3, .feature-post-copy p { overflow-wrap: anywhere; word-break: break-word; }
     .feature-post > svg { opacity: .12; width: 15rem; height: 15rem; }
@@ -1689,6 +1689,10 @@
           <label for="newPostDisplayCode" class="block font-mono text-xs text-cyan-300 mb-1">文章编号（选填）</label>
           <input id="newPostDisplayCode" type="text" maxlength="40" placeholder="例如：RF-001；留空时自动生成" class="w-full px-3 py-2 text-sm bg-slate-950 border border-cyan-500/40 text-white focus:outline-none focus:border-[#F7A8B8]" />
         </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <label class="block font-mono text-xs text-cyan-300">海报大号序号（NO. 后的文字）<input id="newPostIssueNo" type="text" maxlength="12" placeholder="例如：02；留空时自动生成" class="w-full mt-1 px-3 py-2 text-sm bg-slate-950 border border-cyan-500/40 text-white" /></label>
+          <label class="block font-mono text-xs text-pink-200">海报序号下方说明<input id="newPostPlateCaption" type="text" maxlength="80" placeholder="留空可隐藏" class="w-full mt-1 px-3 py-2 text-sm bg-slate-950 border border-pink-300/40 text-white" /></label>
+        </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
@@ -2468,7 +2472,9 @@
         : appState.posts.filter(p => p.category === appState.homeCategory);
 
       container.innerHTML = filtered.map((post, idx) => {
-        const issueNum = post.issueNo || String(idx + 1).padStart(2, '0');
+        const escapeCardText = value => String(value).replace(/[&<>"']/g, character => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[character]));
+        const issueNum = escapeCardText(post.issueNo || String(idx + 1).padStart(2, '0'));
+        const plateCaption = escapeCardText(post.plateCaption ?? 'PLATE // 圆的构成');
         const latin = post.latinSub || 'ORDO LATERANO // ARCHIVE';
 
         // Lead Poster Card (idx === 0): Iconic Ivory Paper + Deconstructed Circle Graphic Spread (Span 8 Cols)
@@ -2502,7 +2508,7 @@
                   <div class="feature-post-number">
                     <div>
                       <span class="feature-number font-display font-black text-[#D45B7A] leading-none">NO.${issueNum}</span>
-                      <span class="font-mono text-[10px] font-bold tracking-widest text-[#05131A]/70 mt-1.5 block">PLATE // 圆的构成</span>
+                      <span class="font-mono text-[10px] font-bold tracking-widest text-[#05131A]/70 mt-1.5 block">${plateCaption}</span>
                     </div>
                     <!-- Mini Deconstructed Circle Stamp -->
                     <svg class="w-16 h-16 mt-3 hidden sm:block" viewBox="0 0 64 64" fill="none">
@@ -3112,6 +3118,8 @@
       const modal = document.getElementById('composeModal');
       const titleInput = document.getElementById('newPostTitle');
       const displayCodeInput = document.getElementById('newPostDisplayCode');
+      const issueNoInput = document.getElementById('newPostIssueNo');
+      const plateCaptionInput = document.getElementById('newPostPlateCaption');
       const catSelect = document.getElementById('newPostCategory');
       const tagsInput = document.getElementById('newPostTags');
       const sumInput = document.getElementById('newPostSummary');
@@ -3123,6 +3131,8 @@
         if (post) {
           titleInput.value = post.title;
           displayCodeInput.value = post.code || '';
+          issueNoInput.value = post.issueNo || '';
+          plateCaptionInput.value = post.plateCaption ?? 'PLATE // 圆的构成';
           catSelect.value = post.category;
           tagsInput.value = (post.tags || []).join(', ');
           sumInput.value = post.summary || '';
@@ -3132,6 +3142,8 @@
       } else {
         titleInput.value = '';
         displayCodeInput.value = '';
+        issueNoInput.value = '';
+        plateCaptionInput.value = 'PLATE // 圆的构成';
         catSelect.value = '';
         tagsInput.value = '';
         sumInput.value = '';
@@ -3179,6 +3191,8 @@
     window.publishNewPost = function() {
       const title = document.getElementById('newPostTitle').value.trim();
       const displayCode = document.getElementById('newPostDisplayCode').value.trim();
+      const issueNo = document.getElementById('newPostIssueNo').value.trim();
+      const plateCaption = document.getElementById('newPostPlateCaption').value.trim();
       const category = document.getElementById('newPostCategory').value.trim() || '未分类';
       const tagsRaw = document.getElementById('newPostTags').value.trim();
       const summary = document.getElementById('newPostSummary').value.trim();
@@ -3204,6 +3218,8 @@
         if (existing) {
           existing.title = title;
           if (displayCode) existing.code = displayCode;
+          if (issueNo) existing.issueNo = issueNo;
+          existing.plateCaption = plateCaption;
           existing.category = category;
           existing.tags = tags;
           existing.summary = cleanSummary;
@@ -3225,7 +3241,8 @@
       const newPost = {
         id: 'post-' + Date.now(),
         code: displayCode || 'LAT-USR-' + String(newIndex).padStart(2, '0'),
-        issueNo: String(newIndex).padStart(2, '0'),
+        issueNo: issueNo || String(newIndex).padStart(2, '0'),
+        plateCaption,
         latinSub: 'NOVA ARCHIVA // ORIGINAL',
         title,
         category,
@@ -4547,10 +4564,13 @@ function applySiteSettings(settings) {
   document.title = settings.name + ' · 个人博客';
 }
 window.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('#composeModal, #articleModal, #friendLinkForm, #social-form, #project-form').forEach(element => element.classList.add('hidden'));
   let adminMode = location.hash === '#rongfu';
+  let hadAdminSession = false;
   try {
+    hadAdminSession = sessionStorage.getItem('simple_blog_admin') === '1';
     if (adminMode) sessionStorage.setItem('simple_blog_admin', '1');
-    else adminMode = sessionStorage.getItem('simple_blog_admin') === '1';
+    else adminMode = hadAdminSession;
   } catch (_) {}
   document.body.classList.toggle('admin-mode', adminMode);
   const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -4928,11 +4948,13 @@ window.addEventListener('DOMContentLoaded', () => {
     if(key==='cloudflare') renderCmsDashboard();
     window.scrollTo({top:0, behavior:'auto'});
   };
-  function enterOwnerMode() {
+  function enterOwnerMode(openSettings = true) {
     document.body.classList.add('admin-mode');
     try { sessionStorage.setItem('simple_blog_admin', '1'); } catch (_) {}
-    switchSection('settings');
-    showToast('已进入站长模式', 'cyan');
+    if (location.hash === '#rongfu') {
+      try { history.replaceState(null, '', location.pathname + location.search); } catch (_) { location.hash = ''; }
+    }
+    if (openSettings) { switchSection('settings'); showToast('已进入站长模式', 'cyan'); }
   }
   window.addEventListener('hashchange', () => {
     if (location.hash === '#rongfu') enterOwnerMode();
@@ -4941,7 +4963,7 @@ window.addEventListener('DOMContentLoaded', () => {
   if (initialNav) initialNav.setAttribute('aria-current', 'page');
   const initialMobileNav = document.querySelector(`#mobileNavMenu button[onclick="switchSection('${appState.currentSection}')"]`);
   if (initialMobileNav) initialMobileNav.setAttribute('aria-current', 'page');
-  if (location.hash === '#rongfu') enterOwnerMode();
+  if (location.hash === '#rongfu') enterOwnerMode(!hadAdminSession);
   if (!adminMode && !['sanctuary', 'audience', 'resting', 'guestbook', 'projects'].includes(appState.currentSection)) switchSection('sanctuary');
   if ('IntersectionObserver' in window && !motionPreference.matches) {
     const observer = new IntersectionObserver(entries => {
