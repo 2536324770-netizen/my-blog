@@ -739,6 +739,186 @@
     }
     @media(max-width:640px){ header .font-serif.text-xl { font-size:1rem; } #sec-sanctuary { padding-top:0; } }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count: 1 !important; transition-duration:.01ms !important; } .blueprint-guide svg { transform: none !important; } .sparkle-particle, .fragment-drift, .enhanced-glow, .monogatari-slice, .breathe-slow, .parallax-float, .subtle-rotate, .fade-pulse { animation: none !important; } }
+
+    /* ==========================================================================
+       增强的阅读界面样式 (千本樱风格优化)
+       ========================================================================== */
+
+    /* 阅读容器 */
+    .ak-reader-container {
+      background: linear-gradient(to bottom, #0A0D12 0%, #05070C 100%);
+    }
+
+    /* 增强的正文排版 */
+    .ak-reader-prose {
+      font-size: var(--reader-font-size, 18px);
+      line-height: 1.85;
+      letter-spacing: 0.02em;
+      color: rgba(226, 232, 240, 0.95);
+      max-width: 65ch;
+    }
+
+    .ak-reader-prose p {
+      margin: 0 0 1.5em;
+      text-align: justify;
+      text-justify: inter-character;
+    }
+
+    .ak-reader-prose h2 {
+      font-family: 'Noto Serif SC', serif;
+      font-weight: 900;
+      font-size: 1.75rem;
+      color: #8ECDE8;
+      border-left: 5px solid #F7A8B8;
+      padding-left: 1rem;
+      margin: 2.5em 0 1em;
+      letter-spacing: 0.04em;
+      line-height: 1.3;
+      text-shadow: 0 2px 12px rgba(142, 205, 232, 0.2);
+    }
+
+    .ak-reader-prose h3 {
+      font-family: 'Noto Serif SC', serif;
+      font-weight: 700;
+      font-size: 1.35rem;
+      color: #F7A8B8;
+      margin: 2em 0 0.75em;
+      letter-spacing: 0.03em;
+      line-height: 1.4;
+      position: relative;
+      padding-left: 1.5rem;
+    }
+
+    .ak-reader-prose h3::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 6px;
+      height: 6px;
+      background: #F7A8B8;
+      border-radius: 50%;
+      box-shadow: 0 0 12px rgba(247, 168, 184, 0.6);
+    }
+
+    .ak-reader-prose blockquote {
+      border-left: 4px solid #8ECDE8;
+      background: linear-gradient(to right, rgba(142, 205, 232, 0.08), transparent);
+      padding: 1.25rem 1.5rem;
+      margin: 2em 0;
+      font-style: italic;
+      color: #E2E8F0;
+      box-shadow: inset 4px 0 8px rgba(142, 205, 232, 0.1);
+    }
+
+    .ak-reader-prose ul,
+    .ak-reader-prose ol {
+      padding-left: 2rem;
+      margin: 1.5em 0;
+    }
+
+    .ak-reader-prose li {
+      margin-bottom: 0.75rem;
+      line-height: 1.75;
+    }
+
+    .ak-reader-prose code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88em;
+      padding: 0.2rem 0.5rem;
+      background: rgba(4, 16, 22, 0.95);
+      border: 1px solid rgba(142, 205, 232, 0.35);
+      color: #F7A8B8;
+      border-radius: 3px;
+    }
+
+    .ak-reader-prose pre {
+      background: rgba(4, 16, 22, 0.95);
+      border: 1px solid rgba(142, 205, 232, 0.25);
+      padding: 1.5rem;
+      margin: 2em 0;
+      overflow-x: auto;
+      border-radius: 6px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .ak-reader-prose pre code {
+      border: none;
+      padding: 0;
+      background: transparent;
+      color: #A5F3FC;
+      font-size: 0.92em;
+    }
+
+    .ak-reader-prose strong {
+      color: #F3EFE6;
+      font-weight: 700;
+    }
+
+    .ak-reader-prose a {
+      color: #8ECDE8;
+      text-decoration: underline;
+      text-decoration-color: rgba(142, 205, 232, 0.3);
+      text-underline-offset: 3px;
+      transition: all 0.2s ease;
+    }
+
+    .ak-reader-prose a:hover {
+      color: #F7A8B8;
+      text-decoration-color: rgba(247, 168, 184, 0.6);
+    }
+
+    .ak-reader-prose img {
+      max-width: 100%;
+      height: auto;
+      margin: 2em auto;
+      border-radius: 6px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .ak-reader-prose hr {
+      border: none;
+      height: 2px;
+      background: linear-gradient(to right, transparent, rgba(142, 205, 232, 0.3), transparent);
+      margin: 3em 0;
+    }
+
+    /* 响应式调整 */
+    @media (max-width: 640px) {
+      .ak-reader-prose {
+        --reader-font-size: 16px;
+        line-height: 1.8;
+      }
+
+      .ak-reader-prose h2 {
+        font-size: 1.5rem;
+        margin: 2em 0 0.75em;
+      }
+
+      .ak-reader-prose h3 {
+        font-size: 1.25rem;
+        margin: 1.5em 0 0.5em;
+      }
+
+      .ak-reader-prose blockquote {
+        padding: 1rem;
+        margin: 1.5em 0;
+      }
+
+      .ak-reader-prose pre {
+        padding: 1rem;
+        margin: 1.5em 0;
+        font-size: 0.85em;
+      }
+    }
+
+    /* 进度条闪光动画 */
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
   </style>
 
 </head>
@@ -1883,86 +2063,121 @@
   </main>
 
   <!-- =========================================================================
-       ARTICLE READER DRAWER / MODAL (瑞士画册级阅读视图)
+       ARTICLE READER DRAWER / MODAL (重新设计的阅读界面)
        ========================================================================= -->
-  <div id="articleModal" class="fixed inset-0 z-40 hidden bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-2 sm:p-6">
-    <div class="ak-panel w-full max-w-4xl max-h-[90vh] flex flex-col border-2 border-cyan-400/60 shadow-[12px_12px_0px_#F7A8B8] overflow-hidden">
-      <!-- Top Reading Progress Bar -->
-      <div class="w-full h-1.5 bg-slate-900">
-        <div id="readingProgressBar" class="h-full bg-gradient-to-r from-cyan-400 via-[#F7A8B8] to-amber-300 w-0 transition-all duration-150"></div>
+  <div id="articleModal" class="fixed inset-0 z-40 hidden bg-slate-950/90 backdrop-blur-lg flex items-center justify-center p-0 sm:p-4">
+    <!-- 背景几何装饰 -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden opacity-15">
+      <svg class="absolute top-10 right-10 w-64 h-64 text-cyan-400/30 animate-[spin_30s_linear_infinite]" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="0.5" stroke-dasharray="5,5"/>
+        <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" stroke-width="0.5"/>
+      </svg>
+      <svg class="absolute bottom-20 left-10 w-48 h-48 text-pink-400/30 animate-[spin_25s_linear_infinite_reverse]" viewBox="0 0 100 100">
+        <polygon points="50,15 85,85 15,85" fill="none" stroke="currentColor" stroke-width="0.5"/>
+      </svg>
+    </div>
+
+    <div class="ak-reader-container w-full h-full sm:h-auto sm:max-w-5xl sm:max-h-[92vh] flex flex-col border-0 sm:border-2 border-cyan-400/40 shadow-[0_0_60px_rgba(142,205,232,0.15)] overflow-hidden bg-[#0A0D12]/95 backdrop-blur-xl">
+      <!-- 顶部进度条 -->
+      <div class="w-full h-1 bg-slate-900/50 relative overflow-hidden">
+        <div id="readingProgressBar" class="h-full bg-gradient-to-r from-cyan-400 via-[#F7A8B8] to-amber-300 w-0 transition-all duration-150 shadow-[0_0_20px_currentColor]"></div>
       </div>
 
-      <!-- Modal Header -->
-      <div class="px-6 py-4 border-b border-cyan-500/30 flex items-center justify-between bg-[#041016]">
-        <div class="flex items-center gap-3 min-w-0">
-          <span id="modalPostIdBadge" class="font-mono text-xs font-bold px-2.5 py-0.5 bg-[#F7A8B8] text-[#05131A]">LAT-01</span>
-          <span id="modalPostCatBadge" class="font-mono text-xs px-2.5 py-0.5 bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">UI/动效解析</span>
+      <!-- 顶部工具栏 -->
+      <div class="px-4 sm:px-6 py-3 border-b border-cyan-500/20 flex items-center justify-between bg-gradient-to-b from-[#041016] to-[#0A0D12]">
+        <div class="flex items-center gap-2 min-w-0">
+          <span id="modalPostIdBadge" class="font-mono text-[10px] sm:text-xs font-bold px-2 py-1 bg-[#F7A8B8] text-[#05131A] shadow-lg">LAT-01</span>
+          <span id="modalPostCatBadge" class="hidden sm:inline-block font-mono text-[10px] px-2 py-1 bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">分类</span>
         </div>
-        <div class="flex flex-wrap items-center gap-1.5">
-          <button onclick="editCurrentArticle()" class="px-2.5 py-1 text-xs font-mono bg-[#F7A8B8]/20 text-pink-200 border border-[#F7A8B8]/50 hover:bg-[#F7A8B8] hover:text-[#05131A]" title="编辑本文">✎ 编辑</button>
-          <button onclick="exportCurrentArticleMd()" class="px-2.5 py-1 text-xs font-mono bg-cyan-500/15 text-cyan-300 border border-cyan-400/40 hover:bg-cyan-400 hover:text-slate-950" title="导出为 Markdown 文件">⬇ .MD</button>
-          <button onclick="deleteCurrentArticle()" class="px-2 py-1 text-xs font-mono border border-rose-500/40 text-rose-300 hover:bg-rose-500 hover:text-white" title="删除该篇文章">🗑</button>
-          <button onclick="adjustFontSize(-1)" class="px-2.5 py-1 text-xs font-mono border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10" title="缩小字号">A-</button>
-          <button onclick="adjustFontSize(1)" class="px-2.5 py-1 text-xs font-mono border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10" title="放大字号">A+</button>
-          <button onclick="closeArticleModal()" class="px-3.5 py-1 text-xs font-mono font-bold bg-[#F3EFE6] text-[#05131A] hover:bg-[#F7A8B8] hover:text-[#05131A] transition-colors">
-            ✕ 关闭档案 [ESC]
+        <div class="flex flex-wrap items-center gap-1">
+          <button onclick="editCurrentArticle()" class="px-2 py-1 text-[10px] sm:text-xs font-mono bg-[#F7A8B8]/20 text-pink-200 border border-[#F7A8B8]/50 hover:bg-[#F7A8B8] hover:text-[#05131A] transition-all duration-200" title="编辑">✎</button>
+          <button onclick="exportCurrentArticleMd()" class="px-2 py-1 text-[10px] sm:text-xs font-mono bg-cyan-500/15 text-cyan-300 border border-cyan-400/40 hover:bg-cyan-400 hover:text-slate-950 transition-all duration-200" title="导出">.MD</button>
+          <button onclick="deleteCurrentArticle()" class="px-2 py-1 text-[10px] sm:text-xs font-mono border border-rose-500/40 text-rose-300 hover:bg-rose-500 hover:text-white transition-all duration-200" title="删除">🗑</button>
+          <button onclick="adjustFontSize(-1)" class="px-2 py-1 text-[10px] sm:text-xs font-mono border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20 transition-all duration-200" title="缩小">A-</button>
+          <button onclick="adjustFontSize(1)" class="px-2 py-1 text-[10px] sm:text-xs font-mono border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20 transition-all duration-200" title="放大">A+</button>
+          <button onclick="closeArticleModal()" class="px-2 sm:px-3 py-1 text-[10px] sm:text-xs font-mono font-bold bg-[#F3EFE6] text-[#05131A] hover:bg-[#F7A8B8] transition-all duration-200">
+            ✕ <span class="hidden sm:inline">ESC</span>
           </button>
         </div>
       </div>
 
-      <!-- Modal Scrollable Body -->
-      <div id="articleModalScroll" onscroll="updateReadingProgress()" class="p-6 sm:p-10 overflow-y-auto space-y-6 flex-1">
-        <div class="space-y-3 border-b-2 border-cyan-500/25 pb-6 relative">
-          <div id="article-eyebrow" class="font-mono text-[10px] tracking-[0.3em] text-[#F7A8B8] uppercase">LATERANO EDITORIAL ARCHIVE // 深度构成研究</div>
-          <h2 id="modalPostTitle" class="font-serif text-2xl sm:text-4xl font-black text-[#F3EFE6] leading-tight"></h2>
-          <div class="flex flex-wrap items-center gap-4 text-xs font-mono text-slate-400 pt-1">
-            <span id="modalPostDate"></span>
-            <span id="modalPostReadTime"></span>
-            <span class="text-cyan-400">👁 <span id="modalPostViews"></span> 次查阅</span>
+      <!-- 主滚动区域 -->
+      <div id="articleModalScroll" onscroll="updateReadingProgress()" class="flex-1 overflow-y-auto">
+        <div class="max-w-3xl mx-auto px-6 sm:px-12 py-8 sm:py-16">
+
+          <!-- 文章头部 -->
+          <header class="space-y-6 pb-12 mb-12 border-b-2 border-cyan-500/20 relative">
+            <!-- 装饰线条 -->
+            <div class="absolute -left-4 top-0 bottom-0 w-1 bg-gradient-to-b from-[#F7A8B8] via-cyan-400 to-transparent opacity-60"></div>
+
+            <div id="article-eyebrow" class="font-mono text-[9px] sm:text-[10px] tracking-[0.25em] text-[#F7A8B8]/80 uppercase">LATERANO EDITORIAL ARCHIVE</div>
+
+            <h1 id="modalPostTitle" class="font-serif text-3xl sm:text-5xl lg:text-6xl font-black text-[#F3EFE6] leading-[1.1] tracking-tight">
+              <!-- 标题将被 JS 填充 -->
+            </h1>
+
+            <div class="flex flex-wrap items-center gap-3 sm:gap-5 text-xs sm:text-sm font-mono text-slate-400/90 pt-2">
+              <span id="modalPostDate" class="text-cyan-400/80"></span>
+              <span class="text-slate-600">·</span>
+              <span id="modalPostReadTime"></span>
+              <span class="text-slate-600">·</span>
+              <span class="text-cyan-400/70">👁 <span id="modalPostViews"></span> 次</span>
+            </div>
+
+            <div id="modalPostTags" class="flex flex-wrap gap-2 pt-2">
+              <!-- 标签将被 JS 填充 -->
+            </div>
+          </header>
+
+          <!-- 目录 (如果有) -->
+          <div id="modalTocContainer" class="hidden mb-12 p-5 bg-gradient-to-br from-[#041016] to-[#0A0D12] border-l-4 border-[#8ECDE8] border border-cyan-500/20 shadow-lg">
+            <div class="font-mono text-[10px] text-cyan-300 font-bold tracking-widest mb-3 flex items-center gap-2">
+              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/></svg>
+              TABLE OF CONTENTS
+            </div>
+            <div id="modalTocList" class="flex flex-wrap gap-2 text-xs font-mono"></div>
           </div>
-          <div id="modalPostTags" class="flex flex-wrap gap-1.5 pt-1"></div>
-        </div>
 
-        <!-- Auto-Generated Table of Contents (TOC // 章节大纲导航) -->
-        <div id="modalTocContainer" class="hidden p-4 bg-[#041016] border-l-4 border-[#8ECDE8] border border-cyan-500/30 space-y-2">
-          <div class="font-mono text-[11px] text-cyan-300 font-bold tracking-widest">📑 TABLE OF CONTENTS // 文章章节目录大纲</div>
-          <div id="modalTocList" class="flex flex-wrap gap-2 text-xs font-mono"></div>
-        </div>
+          <!-- 正文内容 -->
+          <article id="modalPostBody" class="ak-reader-prose space-y-7 text-slate-200/95 leading-[1.85] text-base sm:text-lg">
+            <!-- 正文将被 JS 填充 -->
+          </article>
 
-        <!-- Article Body Content (Supports Full Markdown Rendering) -->
-        <div id="modalPostBody" class="md-prose space-y-4 text-slate-200 leading-relaxed text-sm sm:text-base"></div>
+          <!-- 上下篇导航 -->
+          <nav id="modalPrevNextBar" class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-12 mt-12 border-t border-cyan-500/20">
+            <!-- 导航按钮将被 JS 填充 -->
+          </nav>
 
-        <!-- Prev / Next Post Navigation Bar (上下篇档案切换) -->
-        <div id="modalPrevNextBar" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-cyan-500/25"></div>
-
-        <!-- Interactive Article Actions Bar (Like, Bookmark, Reward Token) -->
-        <div class="p-4 bg-[#030D12] border border-cyan-500/35 flex flex-wrap items-center justify-between gap-3">
-          <div class="flex flex-wrap items-center gap-2.5">
-            <button onclick="likeCurrentArticle()" id="modalLikeBtn" class="px-4 py-2 text-xs font-mono border border-cyan-400/50 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-400 hover:text-slate-950 transition-all">
-              ▲ 律法共鸣 (<span id="modalLikeCount">0</span>)
-            </button>
-            <button onclick="bookmarkCurrentArticle()" id="modalBookmarkBtn" class="px-4 py-2 text-xs font-mono border border-pink-300/50 bg-pink-300/10 text-pink-200 hover:bg-[#F7A8B8] hover:text-[#05131A] transition-all">
-              ☆ 归档收藏
-            </button>
-            <button onclick="tipCurrentArticle()" class="px-4 py-2 text-xs font-mono bg-[#F7A8B8] text-[#05131A] font-bold hover:brightness-110 transition-all">
-              💠 投喂蒙恩的奶嘴 (-10)
+          <!-- 互动按钮区 -->
+          <div class="mt-12 p-5 bg-gradient-to-br from-[#030D12] to-[#041016] border border-cyan-500/25 flex flex-wrap items-center justify-between gap-4 shadow-xl">
+            <div class="flex flex-wrap items-center gap-2.5">
+              <button onclick="likeCurrentArticle()" id="modalLikeBtn" class="px-4 py-2.5 text-xs font-mono border border-cyan-400/50 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-400 hover:text-slate-950 transition-all duration-200 hover:scale-105">
+                ▲ 共鸣 (<span id="modalLikeCount">0</span>)
+              </button>
+              <button onclick="bookmarkCurrentArticle()" id="modalBookmarkBtn" class="px-4 py-2.5 text-xs font-mono border border-pink-300/50 bg-pink-300/10 text-pink-200 hover:bg-[#F7A8B8] hover:text-[#05131A] transition-all duration-200 hover:scale-105">
+                ☆ 收藏
+              </button>
+            </div>
+            <button onclick="copyArticleShareLink()" class="px-4 py-2.5 text-xs font-mono text-slate-300 border border-slate-700 hover:border-cyan-400 transition-all duration-200">
+              🔗 复制链接
             </button>
           </div>
-          <button onclick="copyArticleShareLink()" class="px-3 py-2 text-xs font-mono text-slate-300 border border-slate-700 hover:border-cyan-400">
-            🔗 复制终端引文编码
-          </button>
-        </div>
 
-        <!-- Article Inline Comment Box -->
-        <div class="space-y-3 pt-2">
-          <h4 class="font-serif font-bold text-base text-cyan-300">💬 档案批注与研讨记录</h4>
-          <div class="flex gap-2">
-            <input id="modalCommentInput" type="text" placeholder="添加你对该篇平面设计/代码档案的批注..." class="flex-1 px-3 py-2 text-xs font-mono bg-slate-950 border border-cyan-500/40 text-white focus:outline-none focus:border-[#F7A8B8]" />
-            <button onclick="addArticleComment()" class="px-4 py-2 text-xs font-mono font-bold bg-cyan-400 text-slate-950 hover:bg-cyan-300">
-              发送批注
-            </button>
+          <!-- 评论区 -->
+          <div class="mt-12 space-y-4">
+            <h3 class="font-serif font-bold text-xl text-cyan-300 flex items-center gap-2">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/></svg>
+              评论
+            </h3>
+            <div class="flex gap-2">
+              <input id="modalCommentInput" type="text" placeholder="发表你的看法..." class="flex-1 px-4 py-3 text-sm font-mono bg-slate-950/80 border border-cyan-500/40 text-white placeholder-slate-500 focus:outline-none focus:border-[#F7A8B8] focus:ring-1 focus:ring-[#F7A8B8]/50 transition-all" />
+              <button onclick="addArticleComment()" class="px-5 py-3 text-sm font-mono font-bold bg-cyan-400 text-slate-950 hover:bg-cyan-300 transition-all duration-200 hover:scale-105">
+                发送
+              </button>
+            </div>
+            <div id="modalCommentsList" class="space-y-3 pt-2"></div>
           </div>
-          <div id="modalCommentsList" class="space-y-2 pt-2"></div>
+
         </div>
       </div>
     </div>
@@ -2094,146 +2309,7 @@
         { name: 'PRTS 玩家自由构筑 Wiki', url: 'https://prts.wiki/', desc: '罗德岛人事与活动设定档案库' },
         { name: 'Cloudflare Pages 官方文档', url: 'https://developers.cloudflare.com/pages/', desc: '全球边缘静态与 Serverless 部署平台' }
       ],
-      posts: [
-        {
-          id: 'post-1',
-          code: 'LAT-GEO-01',
-          issueNo: '01',
-          latinSub: 'DECONSTRUCTIO CIRCULI // 100 WAYS',
-          title: '一个圆的100种死法：论《众生行记》如何用纯几何平面构成取代庸俗具象插画',
-          category: '色彩与平面',
-          date: '2026-10-24',
-          readTime: '8 MIN READ',
-          views: 3420,
-          likes: 286,
-          liked: false,
-          bookmarked: true,
-          tags: ['一个圆的100种死法', '平面构成', '众生行记', '青粉美学'],
-          summary: '为什么真正高级的海报与游戏UI从不堆砌具象背景图？结合《【平面构成】一个圆的100种死法》开源技法与《众生行记》圣堂星盘，深度拆解斜切错位、光栅线构、布尔差集与偏心内切五大几何构成法则。',
-          content: [
-            '在网页与视觉设计中，最偷懒也最容易显“俗气”的做法，就是直接铺一张具象的风景或人物插画当背景。而在现代主义平面构成（参考经典教程《【平面构成】一个圆的100种死法》BV1Fepp6ZEoJ）以及鹰角网络《明日方舟·众生行记》的界面设计里，高级感恰恰来自于【克制的几何抽象】——哪怕只用一个基础的“正圆”，通过点、线、面、肌理的解构重组，就能创造出极具戏剧张力的视觉主场。',
-            '技法一：【弦线切分与错位构成（Sliced & Displaced Circle）】。一个完整的实心圆是静止乃至呆板的，但只要沿 45° 或黄金分割弦线一刀切开，令两个半圆产生 16px 的平行错位，再将一个半圆填充蕾缪安淡樱粉（#F7A8B8），另一个半圆填充全息青（#8ECDE8）细密光栅条纹，原本死板的圆立刻产生了强烈的剪切运动感与正负形张力。',
-            '技法二：【线构光栅与摩尔纹干涉（Op-Art Linear Grating）】。不再使用实心色块画圆，而是用间距 6px、旋转 45° 的平行等距线条裁切出圆形边界。当两枚不同倾角的光栅圆发生局部重叠时，视觉上会自然浮现欧普艺术（Op-Art）般的呼吸感，完美契合拉特兰全息圣堂的数字神学气质。',
-            '技法三：【布尔透叠、半调网点与偏心内切（Boolean & Eccentric Tangents）】。通过多个偏心内切圆（遵循斐波那契 1 : 1.618 半径递减）构建不对称平衡，并在交集区域填入波普半调圆点阵列（Halftone Dots）与圣堂米白（#F3EFE6）留白核心。你可以在本页顶部的【平面构成背景切换器】中实时点击切换这 5 种圆的构成形态，直观感受纯几何构成的纯粹美学。'
-          ],
-          codeSnippet: `<!-- 「一个圆的死法」SVG 光栅线构与错位切分核心实现 -->\n<pattern id="pat-grating-cyan" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">\n  <line x1="0" y1="0" x2="0" y2="8" stroke="#8ECDE8" stroke-width="2.6" />\n</pattern>\n<!-- 45° 弦切错位半圆对撞 -->\n<path d="M -115 -115 A 162 162 0 0 1 115 115 Z" fill="#F7A8B8" />\n<path d="M -128 -102 A 162 162 0 0 0 102 128 Z" fill="url(#pat-grating-cyan)" />`,
-          comments: [
-            { author: '新约能天使', time: '2小时前', text: '把具象背景图换成纯几何的错位切分圆和光栅圆之后，整个版面的瑞士海报高级感一下就出来了！' },
-            { author: '视觉传达_Volki', time: '昨天', text: '《一个圆的100种死法》里的线构圆、点阵透叠圆和偏心圆全都在主舞台做成了可交互切换，太顶了！' }
-          ]
-        },
-        {
-          id: 'post-2',
-          code: 'LAT-FX-02',
-          issueNo: '02',
-          latinSub: 'PERSPECTIVA & MOTUS',
-          title: 'Diegetic Interface 实战：当二维平面构成遇上三维全息观瞄视差',
-          category: '前端图形学',
-          date: '2026-10-19',
-          readTime: '6 MIN READ',
-          views: 2190,
-          likes: 194,
-          liked: false,
-          bookmarked: false,
-          tags: ['Diegetic UI', '3D视差', '几何构成', '空间动效'],
-          summary: '详解如何将二维的瑞士几何圆构成海报置于三维画内观瞄投影（Diegetic Interface）之中，在鼠标移动时让偏心圆环与十字准星产生多层级景深呼吸。',
-          content: [
-            '《明日方舟》主看板与「众生行记」活动界面最核心的空间特征，在于将纯粹的二维平面构成图形置于三维画内观瞄投影（Diegetic Interface）之中。',
-            '在 Web 前端复刻这一体验时，我们将最大透视倾角严格约束在 ±1.4° 以内，配合背景 Canvas 上实时绘制的偏心同心圆弧、正交十字准星与青粉几何微粒，让整个页面在静止时是一张严谨的瑞士平面构成展板，而在鼠标划过时立刻呈现出全息仪轨的空间层次。'
-          ],
-          codeSnippet: `// 鼠标跟随的克制 3D 观瞄视差计算\nwindow.addEventListener('mousemove', (e) => {\n  const nx = (e.clientX / window.innerWidth - 0.5) * 2;\n  const ny = (e.clientY / window.innerHeight - 0.5) * 2;\n  stage.style.transform = \`perspective(1400px) rotateY(\${nx * 1.4}deg) rotateX(\${-ny * 1.1}deg)\`;\n});`,
-          comments: [
-            { author: '蕾缪安', time: '3天前', text: '观瞄镜的微视差阻尼调教得刚刚好，既跟手又不破坏几何构成的平面秩序。' }
-          ]
-        },
-        {
-          id: 'post-3',
-          code: 'LAT-COL-03',
-          issueNo: '03',
-          latinSub: 'CHROMATICA // CYAN & SAKURA PINK',
-          title: '青与淡粉的色彩张力：为什么「矿物青+蕾缪安淡樱粉+圣堂白」是几何构成的最佳搭档？',
-          category: '色彩与平面',
-          date: '2026-10-12',
-          readTime: '7 MIN READ',
-          views: 1875,
-          likes: 162,
-          liked: false,
-          bookmarked: true,
-          tags: ['青粉配色', '色块拼贴', '印刷噪点', '色彩构成'],
-          summary: '告别廉价的纯黑底发光套路——从 60:28:12 黄金面积比、冷暖互补色块切割到 SVG 胶片噪点（Film Grain）肌理，拆解几何海报的用色法则。',
-          content: [
-            '在纯粹的几何平面构成中，因为没有具象物体的细节干扰，色彩本身的比例与肌理直接决定了作品的高级感。',
-            '通过在深海矿物青底色（#05131A）与高饱和全息青/蕾缪安淡粉（#8ECDE8 / #F7A8B8）之间引入温暖的圣堂羊皮纸米白（#F3EFE6），并在全屏叠加一层 3.8% 不透明度的 SVG FractalNoise 胶片颗粒滤镜，原本冰冷的矢量圆弧瞬间拥有了丝网印刷海报（Risograph）与艺术出版物的温润质感。'
-          ],
-          codeSnippet: `/* SVG 印刷级微噪点肌理滤镜 */\n<filter id="editorialGrain">\n  <feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="3" />\n</filter>`,
-          comments: []
-        },
-        {
-          id: 'post-4',
-          code: 'LAT-FONT-04',
-          issueNo: '04',
-          latinSub: 'TYPOGRAPHIA MONUMENTALIS',
-          title: '文字即图形：罗马碑铭衬线、空心序号与微缩工程参数的瑞士网格排版',
-          category: '色彩与平面',
-          date: '2026-10-05',
-          readTime: '5 MIN READ',
-          views: 1680,
-          likes: 148,
-          liked: false,
-          bookmarked: false,
-          tags: ['字体排版', '瑞士网格', '空心描边字', '竖排美学'],
-          summary: '拆解罗马碑铭体（Cinzel）、超粗中文宋体的巨型镂空水印字，如何与圆规测量标注、9px 等宽工业编号共同撑起画面的先锋艺术感。',
-          content: [
-            '在平面构成里，“文字本身就是最具表现力的点、线、面”。《众生行记》在版式上大量使用了三种尺度的字体对撞：',
-            '1. 【巨型几何锚点层】：使用 4rem~6rem 的空心描边大字（如 GEOMETRIA、01~06 序号）与解构圆环咬合，打破矩形容器的沉闷边界；2. 【标题叙事层】：采用高对比度中文衬线体（思源宋体 Black）配合斜切高亮色块；3. 【精密制图参数层】：在圆弧切线旁布置极小号等宽字体（Ø=324mm、CROP RATIO 1.618）与裁切十字线，赋予画面严谨的工业美学。'
-          ],
-          codeSnippet: `.text-outline-orange {\n  color: transparent;\n  -webkit-text-stroke: 1.2px rgba(247, 168, 184, 0.65);\n  font-family: 'Cinzel', serif;\n}`,
-          comments: []
-        },
-        {
-          id: 'post-5',
-          code: 'LAT-WORK-05',
-          issueNo: '05',
-          latinSub: 'OFFICINA PAGANINI',
-          title: '潘格尼尼工坊笔记：同心波纹干涉圆与「每日6杯特浓咖啡」交互状态机',
-          category: '拉特兰札记',
-          date: '2026-09-28',
-          readTime: '6 MIN READ',
-          views: 1920,
-          likes: 215,
-          liked: false,
-          bookmarked: false,
-          tags: ['制铳师之夜', '同心圆构成', '状态机', '甜梦会堂'],
-          summary: '复盘如何用三组偏心相交的咖啡涟漪干涉圆构建【制铳师之夜】横幅视觉，并将特浓咖啡订单与【甜梦会堂】兑换转化为博客交互体验。',
-          content: [
-            '在「众生行记」活动中，玩家来到潘格尼尼的铳械工坊后，每日 04:00 咖啡壶可调制 6 杯特浓咖啡，接取订单需要饮用 1 杯特浓咖啡，并可收集「蒙恩的奶嘴」在【甜梦会堂】兑换信物与家具。',
-            '我们在「03 // 制铳师之夜」板块顶部摒弃了传统插画，改用代表“咖啡萃取涟漪”与“铳膛来复线公差”的多重偏心干涉圆构成横幅；访客可以点击饮用特浓咖啡来推进平面实验委托单，并在【甜梦会堂】解锁实时视觉模组与隐藏设定档案。'
-          ],
-          codeSnippet: `// 饮用特浓咖啡推进技术委托单状态\nif (appState.coffeeCups > 0 && order.progress < order.total) {\n  appState.coffeeCups--;\n  order.progress++;\n  appState.tokens += order.reward;\n}`,
-          comments: []
-        },
-        {
-          id: 'post-6',
-          code: 'LAT-SFX-06',
-          issueNo: '06',
-          latinSub: 'SONUS MECHANICUS',
-          title: '极坐标频率圆与 Web Audio API：零外部资源合成明日方舟 UI 声效',
-          category: 'UI/动效解析',
-          date: '2026-09-18',
-          readTime: '5 MIN READ',
-          views: 1540,
-          likes: 139,
-          liked: false,
-          bookmarked: false,
-          tags: ['Web Audio API', '极坐标圆', '百叶窗转场', '前端工程'],
-          summary: '将声波频率映射为极坐标放射刻度圆，并纯靠浏览器原生 OscillatorNode 实时合成清脆的机械微动点击音、青粉色带百叶窗扫频音与成就和弦。',
-          content: [
-            '优秀的平面与交互作品是视听联觉的。在切换板块或切换主舞台「圆的构成形态」时，不仅有全息青、蕾缪安淡粉、圣堂米白三道几何色带横扫屏幕的百叶窗转场（Shutter Transition），还会同步触发 Web Audio API 合成的三角波/正弦波扫频电子声效。'
-          ],
-          codeSnippet: `osc.type = 'triangle';\nosc.frequency.setValueAtTime(1180, now);\nosc.frequency.exponentialRampToValueAtTime(420, now + 0.055);`,
-          comments: []
-        }
-      ],
+      posts: [],
       orders: [
         {
           id: 'ord-1',
@@ -5588,7 +5664,7 @@ window.addEventListener('DOMContentLoaded', () => {
 <script id="baked-cloudflare-state">
 (function () {
   try {
-    const baked = {"posts": [{"id": "post-1793146514669", "code": "LAT-USR-02", "issueNo": "02", "latinSub": "NOVA ARCHIVA // ORIGINAL", "title": "测试", "category": "测试", "date": "2026-10-28", "readTime": "2 MIN READ", "views": 12, "likes": 1, "liked": true, "bookmarked": true, "tags": ["测试"], "summary": "测试", "content": ["测试"], "codeSnippet": "", "comments": []}], "confessions": [], "friendLinks": [], "siteSettings": {"name": "绒芙咖啡", "badge": "憩", "headerSubtitle": "HAVE YOU TIME", "introEnglish": "ENJOY LIFE", "description": "我的一些小想法", "sectionEnglish": "LATEST POSTS", "sectionTitle": "最新文章", "aboutTitle": "荣芙", "aboutSubtitle": "Is me", "aboutDescription": "一个有闲情雅致的普通人 马甲\"lqfy", "startDate": "2026-10-28", "musicTitle": "", "musicUrl": "", "locationLabel": "遥远的彼端", "githubUrl": "https://github.com/2536324770-netizen"}, "socialLinks": [], "projects": []};
+    const baked = {"posts": [], "confessions": [], "friendLinks": [], "siteSettings": {"name": "绒芙咖啡", "badge": "憩", "headerSubtitle": "HAVE YOU TIME", "introEnglish": "ENJOY LIFE", "description": "我的一些小想法", "sectionEnglish": "LATEST POSTS", "sectionTitle": "最新文章", "aboutTitle": "荣芙", "aboutSubtitle": "Is me", "aboutDescription": "一个有闲情雅致的普通人 马甲\"lqfy", "startDate": "2026-10-28", "musicTitle": "", "musicUrl": "", "locationLabel": "遥远的彼端", "githubUrl": "https://github.com/2536324770-netizen"}, "socialLinks": [], "projects": []};
     if (!localStorage.getItem('laterano_blog_cms_v2')) localStorage.setItem('laterano_blog_cms_v2', JSON.stringify(baked));
     if (baked.siteSettings && !localStorage.getItem('simple_blog_site_settings_v1')) localStorage.setItem('simple_blog_site_settings_v1', JSON.stringify(baked.siteSettings));
     if (Array.isArray(baked.socialLinks) && !localStorage.getItem('simple_blog_social_v1')) localStorage.setItem('simple_blog_social_v1', JSON.stringify(baked.socialLinks));
