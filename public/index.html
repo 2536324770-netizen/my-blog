@@ -185,24 +185,62 @@
       backdrop-filter: blur(12px);
       border: 1px solid var(--border-tech);
       transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease, box-shadow 0.35s ease;
+      position: relative;
+    }
+    .ak-card::after {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      background: linear-gradient(135deg, rgba(142, 205, 232, 0.06), rgba(247, 168, 184, 0.04));
+      border-radius: inherit;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      pointer-events: none;
+      z-index: -1;
     }
     .ak-card:hover {
       transform: translateY(-5px);
       border-color: var(--cyan-main);
-      box-shadow: 0 20px 38px -10px var(--cyan-glow), -5px 0 0 0 var(--orange-main);
+      box-shadow: 0 20px 38px -10px var(--cyan-glow), -5px 0 0 0 var(--orange-main), 0 0 30px rgba(142, 205, 232, 0.12);
+    }
+    .ak-card:hover::after {
+      opacity: 1;
+    }
+    .ak-card:hover .text-outline-cyan,
+    .ak-card:hover .text-outline-orange {
+      filter: drop-shadow(0 0 8px rgba(142, 205, 232, 0.4));
     }
 
     /* Ivory Sanctuary Poster Card (High-Art Contrast Block) */
     .ak-poster-ivory {
-      background: #F3EFE6;
+      background: linear-gradient(135deg, #F3EFE6 0%, #F8F4EB 100%);
       color: #061820;
       border: 1px solid rgba(247, 168, 184, 0.45);
       box-shadow: 12px 12px 0px #F7A8B8, 0 20px 45px rgba(0, 0, 0, 0.5);
       transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+      position: relative;
+    }
+    .ak-poster-ivory::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(142, 205, 232, 0.03) 0%, rgba(247, 168, 184, 0.05) 100%);
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      pointer-events: none;
     }
     .ak-poster-ivory:hover {
       transform: translate(-3px, -3px);
-      box-shadow: 16px 16px 0px #8ECDE8, 0 25px 50px rgba(142, 205, 232, 0.28);
+      box-shadow: 16px 16px 0px #8ECDE8, 0 25px 50px rgba(142, 205, 232, 0.28), 0 0 40px rgba(247, 168, 184, 0.15);
+    }
+    .ak-poster-ivory:hover::before {
+      opacity: 1;
+    }
+    .ak-poster-ivory:hover > svg {
+      filter: drop-shadow(0 0 10px rgba(142, 205, 232, 0.45));
     }
 
     /* Architectural Compass & Blueprint Grid Overlay */
@@ -243,6 +281,52 @@
     .halo-pulse { animation: pulseGlow 4.5s ease-in-out infinite; }
     .geo-slice-float { animation: floatSlice 6s ease-in-out infinite; }
     .geo-slice-float-rev { animation: floatSliceReverse 6s ease-in-out infinite; }
+
+    /* 千本樱风格增强：粒子闪烁、几何碎片漂浮、光晕脉冲 */
+    @keyframes particleSparkle {
+      0%, 100% { opacity: 0.2; transform: scale(0.8) translateY(0px); }
+      50% { opacity: 0.95; transform: scale(1.2) translateY(-12px); }
+    }
+    @keyframes fragmentDrift {
+      0%, 100% { transform: translate(0px, 0px) rotate(0deg); opacity: 0.6; }
+      33% { transform: translate(18px, -18px) rotate(8deg); opacity: 0.85; }
+      66% { transform: translate(-12px, 12px) rotate(-5deg); opacity: 0.75; }
+    }
+    @keyframes enhancedGlow {
+      0%, 100% { filter: drop-shadow(0 0 6px rgba(142, 205, 232, 0.35)) drop-shadow(0 0 12px rgba(247, 168, 184, 0.25)); }
+      50% { filter: drop-shadow(0 0 16px rgba(142, 205, 232, 0.65)) drop-shadow(0 0 22px rgba(247, 168, 184, 0.55)); }
+    }
+    /* 物语系列意识流效果 */
+    @keyframes monogatariSlice {
+      0%, 100% { transform: translateX(0px) skewX(0deg); opacity: 0.7; }
+      25% { transform: translateX(8px) skewX(2deg); opacity: 0.9; }
+      75% { transform: translateX(-8px) skewX(-2deg); opacity: 0.85; }
+    }
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); opacity: 0.6; }
+      50% { transform: scale(1.05); opacity: 0.85; }
+    }
+    @keyframes parallaxFloat {
+      0%, 100% { transform: translate(0px, 0px); }
+      33% { transform: translate(12px, -15px); }
+      66% { transform: translate(-10px, 10px); }
+    }
+    @keyframes subtleRotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0.15; }
+      50% { opacity: 0.5; }
+    }
+    .sparkle-particle { animation: particleSparkle 3.5s ease-in-out infinite; }
+    .fragment-drift { animation: fragmentDrift 8s ease-in-out infinite; }
+    .enhanced-glow { animation: enhancedGlow 4s ease-in-out infinite; }
+    .monogatari-slice { animation: monogatariSlice 6s ease-in-out infinite; }
+    .breathe-slow { animation: breathe 8s ease-in-out infinite; }
+    .parallax-float { animation: parallaxFloat 12s ease-in-out infinite; }
+    .subtle-rotate { animation: subtleRotate 80s linear infinite; }
+    .fade-pulse { animation: fadeInOut 5s ease-in-out infinite; }
 
     /* Arknights Page Transition Shutter */
     #shutterOverlay {
@@ -388,8 +472,19 @@
       border: 1px solid rgba(142,205,232,.3); border-radius: 50%; pointer-events: none;
       background: repeating-linear-gradient(135deg, transparent 0 7px, rgba(247,168,184,.18) 7px 8px);
       box-shadow: inset 0 0 0 20px rgba(7,24,32,.65), 14px 14px 0 -13px rgba(247,168,184,.6);
+      animation: breathe 8s ease-in-out infinite;
     }
     @media (max-width:640px) { .simple-intro::after { width:64px; height:64px; right:.4rem; opacity:.55; } }
+
+    /* 物语系列：为首页标题和简介添加微妙的意识流效果 */
+    #sec-sanctuary > .simple-intro h1 {
+      text-shadow: 3px 3px 0 rgba(142, 205, 232, 0.12), -2px -2px 0 rgba(247, 168, 184, 0.08);
+      transition: all 0.4s ease;
+    }
+    #sec-sanctuary > .simple-intro h1:hover {
+      text-shadow: 5px 5px 0 rgba(142, 205, 232, 0.22), -3px -3px 0 rgba(247, 168, 184, 0.18);
+      transform: translateY(-2px);
+    }
 
     main { padding-left: 1rem !important; max-width: 1100px !important; }
     .ak-panel, .ak-card { backdrop-filter: none; box-shadow: none; }
@@ -488,13 +583,13 @@
       main button:hover, header button:hover { transform: translateY(-2px); }
       #site-home-extras .ak-panel, #sec-guestbook .ak-panel { transition: border-color .3s ease, box-shadow .3s ease; }
       #site-home-extras .ak-panel:hover, #sec-guestbook .ak-panel:hover { border-color: rgba(142,205,232,.6); box-shadow: 0 8px 24px rgba(142,205,232,.10); }
-      #homePostsGrid article svg, #archivePostsList article svg { transition: transform .65s ease; transform-origin: center; }
-      #homePostsGrid article:hover svg, #archivePostsList article:hover svg { transform: rotate(12deg) scale(1.04); }
+      #homePostsGrid article svg, #archivePostsList article svg { transition: transform .65s ease, filter .65s ease; transform-origin: center; }
+      #homePostsGrid article:hover svg, #archivePostsList article:hover svg { transform: rotate(12deg) scale(1.04); filter: drop-shadow(0 0 6px rgba(142, 205, 232, 0.3)); }
       #friendLinksGrid > div { transition: transform .25s ease, border-color .25s ease; }
       #friendLinksGrid > div:hover { transform: translateY(-3px); border-color: #f7a8b8; }
     }
     @media(max-width:640px){ header .font-serif.text-xl { font-size:1rem; } #sec-sanctuary { padding-top:0; } }
-    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count: 1 !important; transition-duration:.01ms !important; } .blueprint-guide svg { transform: none !important; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count: 1 !important; transition-duration:.01ms !important; } .blueprint-guide svg { transform: none !important; } .sparkle-particle, .fragment-drift, .enhanced-glow, .monogatari-slice, .breathe-slow, .parallax-float, .subtle-rotate, .fade-pulse { animation: none !important; } }
   </style>
 
 </head>
@@ -593,6 +688,83 @@
     <!-- Golden Ratio Measurement Crosshair Lines -->
     <div class="hidden xl:block absolute top-0 bottom-0 left-[68px] w-px bg-gradient-to-b from-cyan-400/30 via-pink-300/25 to-cyan-400/30"></div>
     <div class="hidden xl:block absolute top-0 bottom-0 right-[52px] w-px bg-cyan-400/15"></div>
+  </div>
+
+  <!-- 千本樱风格：漂浮的几何光点粒子层 -->
+  <div class="fixed inset-0 pointer-events-none z-[1] overflow-hidden" aria-hidden="true">
+    <!-- 左上角粒子群 -->
+    <div class="absolute top-[15%] left-[8%] w-2 h-2 bg-cyan-400/60 rounded-full sparkle-particle" style="animation-delay: 0s;"></div>
+    <div class="absolute top-[22%] left-[12%] w-1.5 h-1.5 bg-pink-300/50 rounded-full sparkle-particle" style="animation-delay: 1.2s;"></div>
+    <div class="absolute top-[18%] left-[15%] w-1 h-1 bg-cyan-300/70 rounded-full sparkle-particle" style="animation-delay: 2.5s;"></div>
+    <div class="absolute top-[12%] left-[18%] w-1 h-1 bg-pink-400/55 rounded-full sparkle-particle" style="animation-delay: 3.8s;"></div>
+
+    <!-- 右侧粒子群 -->
+    <div class="absolute top-[35%] right-[10%] w-2 h-2 bg-pink-400/60 rounded-full sparkle-particle" style="animation-delay: 0.8s;"></div>
+    <div class="absolute top-[42%] right-[15%] w-1.5 h-1.5 bg-cyan-300/50 rounded-full sparkle-particle" style="animation-delay: 2s;"></div>
+    <div class="absolute top-[38%] right-[8%] w-1 h-1 bg-pink-300/70 rounded-full sparkle-particle" style="animation-delay: 3.2s;"></div>
+    <div class="absolute top-[30%] right-[12%] w-1.5 h-1.5 bg-cyan-400/65 rounded-full sparkle-particle" style="animation-delay: 4.5s;"></div>
+
+    <!-- 中部粒子 -->
+    <div class="absolute top-[50%] left-[35%] w-1.5 h-1.5 bg-cyan-400/55 rounded-full sparkle-particle" style="animation-delay: 1.8s;"></div>
+    <div class="absolute top-[55%] right-[30%] w-1 h-1 bg-pink-400/60 rounded-full sparkle-particle" style="animation-delay: 2.3s;"></div>
+    <div class="absolute top-[48%] left-[42%] w-1 h-1 bg-cyan-300/50 rounded-full sparkle-particle" style="animation-delay: 3.7s;"></div>
+
+    <!-- 底部粒子群 -->
+    <div class="absolute bottom-[25%] left-[20%] w-1.5 h-1.5 bg-cyan-400/60 rounded-full sparkle-particle" style="animation-delay: 1.5s;"></div>
+    <div class="absolute bottom-[30%] left-[25%] w-1 h-1 bg-pink-300/50 rounded-full sparkle-particle" style="animation-delay: 2.8s;"></div>
+    <div class="absolute bottom-[20%] right-[22%] w-1.5 h-1.5 bg-cyan-300/55 rounded-full sparkle-particle" style="animation-delay: 3.5s;"></div>
+    <div class="absolute bottom-[28%] right-[18%] w-1 h-1 bg-pink-400/60 rounded-full sparkle-particle" style="animation-delay: 4.2s;"></div>
+
+    <!-- 物语系列意识流几何碎片 -->
+    <svg class="absolute top-[28%] left-[35%] w-16 h-16 opacity-20 fragment-drift" viewBox="0 0 64 64" fill="none">
+      <path d="M32 8 L56 32 L32 56 L8 32 Z" stroke="#8ECDE8" stroke-width="1" fill="rgba(142, 205, 232, 0.1)" />
+      <circle cx="32" cy="32" r="8" fill="#F7A8B8" opacity="0.6" />
+    </svg>
+    <svg class="absolute top-[60%] right-[25%] w-12 h-12 opacity-25 fragment-drift" style="animation-delay: -3s;" viewBox="0 0 48 48" fill="none">
+      <circle cx="24" cy="24" r="20" stroke="#F7A8B8" stroke-width="1" stroke-dasharray="4 4" fill="rgba(247, 168, 184, 0.08)" />
+      <circle cx="24" cy="24" r="6" fill="#8ECDE8" />
+    </svg>
+    <svg class="absolute bottom-[35%] left-[45%] w-14 h-14 opacity-18 fragment-drift" style="animation-delay: -5s;" viewBox="0 0 56 56" fill="none">
+      <rect x="10" y="10" width="36" height="36" stroke="#8ECDE8" stroke-width="1" transform="rotate(45 28 28)" fill="rgba(142, 205, 232, 0.06)" />
+      <circle cx="28" cy="28" r="5" fill="#F7A8B8" opacity="0.7" />
+    </svg>
+
+    <!-- 新增：物语系列斜切文字框架风格几何 -->
+    <svg class="absolute top-[20%] right-[35%] w-24 h-24 opacity-15 monogatari-slice" viewBox="0 0 96 96" fill="none">
+      <path d="M20 10 L80 20 L76 86 L16 76 Z" stroke="#8ECDE8" stroke-width="0.8" fill="rgba(142, 205, 232, 0.05)" />
+      <line x1="20" y1="10" x2="76" y2="86" stroke="#F7A8B8" stroke-width="0.5" stroke-dasharray="3 3" />
+    </svg>
+    <svg class="absolute bottom-[45%] left-[15%] w-20 h-20 opacity-18 monogatari-slice" style="animation-delay: -2s;" viewBox="0 0 80 80" fill="none">
+      <path d="M10 30 L70 25 L75 55 L15 60 Z" stroke="#F7A8B8" stroke-width="0.8" fill="rgba(247, 168, 184, 0.06)" />
+      <circle cx="40" cy="42" r="8" stroke="#8ECDE8" stroke-width="0.6" fill="none" />
+    </svg>
+
+    <!-- 呼吸动画的大圆环（乔布斯式极简） -->
+    <svg class="absolute top-[40%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] opacity-10 breathe-slow" viewBox="0 0 400 400" fill="none">
+      <circle cx="200" cy="200" r="180" stroke="#8ECDE8" stroke-width="0.5" />
+      <circle cx="200" cy="200" r="140" stroke="#F7A8B8" stroke-width="0.5" stroke-dasharray="8 8" />
+      <circle cx="200" cy="200" r="100" stroke="#8ECDE8" stroke-width="0.3" />
+    </svg>
+
+    <!-- 视差漂浮的小几何点缀 -->
+    <div class="absolute top-[65%] left-[60%] w-3 h-3 border border-cyan-400/40 rotate-45 parallax-float" style="animation-delay: -1s;"></div>
+    <div class="absolute top-[70%] right-[40%] w-2 h-2 border border-pink-400/40 parallax-float" style="animation-delay: -3s;"></div>
+    <div class="absolute bottom-[15%] left-[55%] w-2.5 h-2.5 border border-cyan-300/35 rotate-45 parallax-float" style="animation-delay: -5s;"></div>
+
+    <!-- 缓慢旋转的装饰线条（意识流风格） -->
+    <svg class="absolute top-[10%] left-[25%] w-32 h-32 opacity-12 subtle-rotate" viewBox="0 0 128 128" fill="none">
+      <path d="M64 10 Q90 40 64 70 Q38 40 64 10" stroke="#8ECDE8" stroke-width="0.8" fill="none" />
+      <path d="M64 58 Q90 88 64 118 Q38 88 64 58" stroke="#F7A8B8" stroke-width="0.8" fill="none" />
+    </svg>
+    <svg class="absolute bottom-[10%] right-[15%] w-28 h-28 opacity-10 subtle-rotate" style="animation-direction: reverse;" viewBox="0 0 112 112" fill="none">
+      <line x1="10" y1="10" x2="102" y2="102" stroke="#F7A8B8" stroke-width="0.6" />
+      <line x1="102" y1="10" x2="10" y2="102" stroke="#8ECDE8" stroke-width="0.6" />
+      <circle cx="56" cy="56" r="35" stroke="#8ECDE8" stroke-width="0.5" stroke-dasharray="4 4" />
+    </svg>
+
+    <!-- 渐显渐隐的抽象光带 -->
+    <div class="absolute top-0 left-[20%] w-px h-full bg-gradient-to-b from-transparent via-cyan-400/20 to-transparent fade-pulse"></div>
+    <div class="absolute top-0 right-[30%] w-px h-full bg-gradient-to-b from-transparent via-pink-400/15 to-transparent fade-pulse" style="animation-delay: -2.5s;"></div>
   </div>
 
   <!-- Fixed Left Editorial Spine (Swiss Magazine / Eagle Point Graphic Identity) -->
