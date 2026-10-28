@@ -3148,13 +3148,19 @@
 
     // --- 7. ARTICLE READER MODAL & INTERACTIONS ---
     window.openArticle = function(postId) {
+      console.log('[DEBUG] openArticle called with postId:', postId);
       playSound('click');
       const post = appState.posts.find(p => p.id === postId);
-      if (!post) return;
+      console.log('[DEBUG] Found post:', post);
+      if (!post) {
+        console.error('[ERROR] Post not found!');
+        return;
+      }
 
       appState.currentArticleId = postId;
       post.views += 1;
 
+      console.log('[DEBUG] Setting title:', post.title);
       document.getElementById('modalPostIdBadge').textContent = post.code;
       document.getElementById('modalPostCatBadge').textContent = post.category;
       document.getElementById('modalPostTitle').textContent = post.title;
@@ -3166,7 +3172,9 @@
         .map(t => `<span class="text-xs font-mono px-2 py-0.5 bg-cyan-950 text-cyan-300 border border-cyan-500/30">#${t}</span>`)
         .join('');
 
+      console.log('[DEBUG] Rendering content:', post.content);
       const { htmlContent, tocItems } = renderMarkdownWithToc(post.content);
+      console.log('[DEBUG] Rendered HTML length:', htmlContent.length);
       const bodyHtml = htmlContent +
         (post.codeSnippet ? `
           <div class="mt-4 bg-slate-950 border-l-4 border-l-[#F7A8B8] border border-cyan-500/40 overflow-hidden">
@@ -3179,7 +3187,10 @@
         ` : '');
 
       const bodyEl = document.getElementById('modalPostBody');
+      console.log('[DEBUG] Body element:', bodyEl);
+      console.log('[DEBUG] Setting innerHTML, length:', bodyHtml.length);
       bodyEl.innerHTML = bodyHtml;
+      console.log('[DEBUG] After setting innerHTML, bodyEl.innerHTML:', bodyEl.innerHTML.substring(0, 200));
 
       const tocContainer = document.getElementById('modalTocContainer');
       const tocList = document.getElementById('modalTocList');
