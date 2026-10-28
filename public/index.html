@@ -4353,7 +4353,7 @@ id = "在此填入你的_CLOUDFLARE_KV_NAMESPACE_ID"
 
 <script id="simple-blog-interface">
 const siteSettingsKey = 'simple_blog_site_settings_v1';
-const defaultSiteSettings = { name:'众生行记', badge:'平面构成', headerSubtitle:'Geometric Planar Art // Editorial', introEnglish:'THE MASSES’ TRAVELS', description:'记录想法、设计与生活。欢迎在这里慢慢阅读。', sectionEnglish:'LATEST POSTS', sectionTitle:'最新文章', aboutTitle:'关于我', aboutSubtitle:'平面构成研究者 · 游戏 UI/UX 与动效工程师', aboutDescription:'', startDate:'', musicTitle:'', musicUrl:'', locationLabel:'', githubUrl:'' };
+const defaultSiteSettings = { name:'众生行记', badge:'平面构成', headerSubtitle:'Geometric Planar Art // Editorial', introEnglish:'THE MASSES’ TRAVELS', description:'记录想法、设计与生活。欢迎在这里慢慢阅读。', sectionEnglish:'LATEST POSTS', sectionTitle:'最新文章', aboutTitle:'关于我', aboutSubtitle:'平面构成研究者 · 游戏 UI/UX 与动效工程师', aboutDescription:'', startDate:'', musicTitle:'', musicUrl:'', musicPlaylist:'', locationLabel:'', githubUrl:'' };
 function readSiteSettings() {
   try { return { ...defaultSiteSettings, ...JSON.parse(localStorage.getItem(siteSettingsKey) || '{}') }; }
   catch (_) { return { ...defaultSiteSettings }; }
@@ -4393,6 +4393,34 @@ function renderProjects() {
 function githubProfileUrl(value) {
   try { const url = new URL(value); return url.protocol === 'https:' && url.hostname.toLowerCase() === 'github.com' && url.pathname !== '/' ? url.href : ''; }
   catch (_) { return ''; }
+}
+let musicTracks = [];
+let musicIndex = -1;
+let musicSignature = '';
+function parseMusicPlaylist(settings) {
+  const lines = (settings.musicPlaylist || '').split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+  if (!lines.length && settings.musicUrl) lines.push((settings.musicTitle || '音乐') + ' | ' + settings.musicUrl);
+  return lines.map(line => {
+    const separator = line.indexOf('|');
+    const name = separator < 0 ? '' : line.slice(0, separator).trim();
+    const address = (separator < 0 ? line : line.slice(separator + 1)).trim();
+    try {
+      const url = new URL(address, location.href);
+      if (!['http:', 'https:'].includes(url.protocol)) return null;
+      return { name: name || decodeURIComponent(url.pathname.split('/').pop() || '音乐'), url: url.href };
+    } catch (_) { return null; }
+  });
+}
+function chooseMusic(play) {
+  const audio = document.getElementById('site-music-audio');
+  if (!audio || !musicTracks.length) return;
+  let next = Math.floor(Math.random() * musicTracks.length);
+  if (musicTracks.length > 1 && next === musicIndex) next = (next + 1 + Math.floor(Math.random() * (musicTracks.length - 1))) % musicTracks.length;
+  musicIndex = next;
+  const track = musicTracks[next]; audio.src = track.url; audio.setAttribute('data-url', track.url);
+  document.getElementById('site-music-title').textContent = '♫ ' + track.name;
+  document.getElementById('site-music-status').textContent = '随机播放 · 共 ' + musicTracks.length + ' 首';
+  if (play) audio.play().catch(() => { document.getElementById('site-music-status').textContent = '请点击播放器开始播放。'; });
 }
 function renderSocialLinks() {
   const grid = document.getElementById('social-links-list');
@@ -4450,15 +4478,15 @@ function applySiteSettings(settings) {
   const musicStatus = document.getElementById('site-music-status');
   const musicTitle = document.getElementById('site-music-title');
   if (audio && musicStatus && musicTitle) {
-    let url = '';
-    try { const candidate = new URL(settings.musicUrl); if (['https:', 'http:'].includes(candidate.protocol)) url = candidate.href; } catch (_) {}
-    musicTitle.textContent = settings.musicTitle || '音乐播放器';
-    if (audio.getAttribute('data-url') !== url) {
-      audio.pause(); audio.removeAttribute('src'); audio.setAttribute('data-url', url);
-      if (url) audio.src = url; else audio.load();
+    const tracks = parseMusicPlaylist(settings).filter(Boolean);
+    const signature = JSON.stringify(tracks);
+    if (signature !== musicSignature) {
+      audio.pause(); musicTracks = tracks; musicIndex = -1; musicSignature = signature;
+      if (tracks.length) chooseMusic(false);
+      else { audio.removeAttribute('src'); audio.removeAttribute('data-url'); audio.load(); musicTitle.textContent = '音乐播放器'; musicStatus.textContent = '在网站设置中添加歌单，即可播放。'; }
     }
-    audio.hidden = !url;
-    musicStatus.textContent = url ? '点击播放，享受音乐。' : '在“文章管理 → 网站文字设置”中填写音乐直链，即可播放。';
+    audio.hidden = !tracks.length;
+    const shuffle = document.getElementById('site-music-next'); if (shuffle) shuffle.hidden = tracks.length === 0;
   }
   document.title = settings.name + ' · 个人博客';
 }
@@ -4676,6 +4704,13 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('site-music-audio').addEventListener('error', () => {
     document.getElementById('site-music-status').textContent = '音乐加载失败，请检查链接是否为可公开访问的音频直链。';
   });
+  if (!document.getElementById('site-music-next')) {
+    const button = document.createElement('button'); button.id = 'site-music-next'; button.type = 'button'; button.hidden = true;
+    button.className = 'mt-2 px-3 py-1 text-xs text-cyan-300 border border-cyan-500/40'; button.textContent = '随机下一首 ↻';
+    document.getElementById('site-music-status').after(button);
+  }
+  document.getElementById('site-music-next').addEventListener('click', () => chooseMusic(true));
+  document.getElementById('site-music-audio').addEventListener('ended', () => chooseMusic(true));
   if (!document.getElementById('simple-toolbar')) {
     const toolbar=document.createElement('div'); toolbar.id='simple-toolbar'; toolbar.className='simple-toolbar';
     toolbar.innerHTML='<h2>文章管理</h2><p>在这里写文章、管理已有文章和备份数据。文章先保存在当前浏览器；如需让其他人看到更新，请导出网页并重新部署。</p><div class="simple-actions"><button onclick="openComposeModal()">＋ 写文章</button><button onclick="triggerMarkdownImport()">导入 Markdown</button><button onclick="exportPostsJson()">导出数据备份</button><button onclick="triggerJsonImport()">恢复数据备份</button><button onclick="exportBakedIndexHtml()">导出网站文件</button></div>';
@@ -4748,6 +4783,11 @@ window.addEventListener('DOMContentLoaded', () => {
     label.innerHTML = '项目 · GitHub 主页<input name="githubUrl" type="url" maxlength="2048" placeholder="https://github.com/你的用户名" class="w-full mt-1 px-3 py-2 bg-slate-950 border border-cyan-500/40 text-white" /><span class="block text-xs text-slate-400 mt-1">保存后，顶部“项目”会在新标签页打开这个地址。</span>';
     settingsForm.insertBefore(label, settingsForm.querySelector('.simple-actions'));
   }
+  if (!settingsForm.elements.musicPlaylist) {
+    const label = document.createElement('label'); label.className = 'text-sm text-slate-300 sm:col-span-2';
+    label.innerHTML = '随机播放歌单<textarea name="musicPlaylist" rows="5" maxlength="20000" placeholder="歌名 | https://example.com/music/song1.mp3&#10;另一首 | /music/song2.mp3" class="w-full mt-1 px-3 py-2 bg-slate-950 border border-cyan-500/40 text-white"></textarea><span class="block text-xs text-slate-400 mt-1">每行填写一首：歌名 | 音频文件地址。也可以只填地址；可用 /music/文件名 指向上传到网站的音乐。歌单留空时继续使用上面的单首音乐。</span>';
+    settingsForm.insertBefore(label, settingsForm.querySelector('.simple-actions'));
+  }
   const fillSettings = settings => { for (const key of Object.keys(defaultSiteSettings)) settingsForm.elements[key].value = settings[key]; };
   const settings = readSiteSettings(); fillSettings(settings); applySiteSettings(settings);
   setInterval(() => updateSiteRuntime(readSiteSettings().startDate), 60000);
@@ -4755,6 +4795,7 @@ window.addEventListener('DOMContentLoaded', () => {
     event.preventDefault();
     const updated = {}; for (const key of Object.keys(defaultSiteSettings)) updated[key] = settingsForm.elements[key].value.trim();
     if (!updated.name) return;
+    if (updated.musicPlaylist && parseMusicPlaylist(updated).some(track => !track)) { showToast('歌单中有无效地址，请检查每一行', 'orange'); return; }
     if (updated.githubUrl && !githubProfileUrl(updated.githubUrl)) { showToast('请输入有效的 GitHub 主页地址，例如 https://github.com/用户名', 'orange'); return; }
     if (updated.musicUrl) {
       try { const url = new URL(updated.musicUrl); if (!['http:', 'https:'].includes(url.protocol)) throw new Error('invalid'); }
