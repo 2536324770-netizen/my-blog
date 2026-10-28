@@ -2835,7 +2835,6 @@
         `;
       }
 
-      try { history.replaceState(null, '', '#post/' + postId); } catch (e) {}
       saveStateToLocalStorage();
       updateModalButtons(post);
       renderArticleComments(post);
@@ -2975,7 +2974,9 @@
     window.copyArticleShareLink = function() {
       const post = appState.posts.find(p => p.id === appState.currentArticleId);
       if (!post) return;
-      copyTextToClipboard(`【众生行记 // ${post.code}】${post.title}`, '终端引文编码已复制至剪贴板');
+      const shareUrl = new URL(window.location.href);
+      shareUrl.hash = 'post/' + post.id;
+      copyTextToClipboard(shareUrl.href, '文章链接已复制');
     };
 
     function copyTextToClipboard(text, msg) {
@@ -2996,6 +2997,9 @@
     window.closeArticleModal = function() {
       playSound('click');
       document.getElementById('articleModal').classList.add('hidden');
+      if (window.location.hash.startsWith('#post/')) {
+        try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch (_) {}
+      }
     };
 
     // --- 7B. MARKDOWN PARSER, TOC GENERATOR & ARTICLE EDIT/DELETE/EXPORT ---
@@ -4393,7 +4397,10 @@ id = "在此填入你的_CLOUDFLARE_KV_NAMESPACE_ID"
 
       if (window.location.hash && window.location.hash.startsWith('#post/')) {
         const targetId = window.location.hash.replace('#post/', '').trim();
-        if (appState.posts.some(p => p.id === targetId)) {
+        const navigation = performance.getEntriesByType?.('navigation')?.[0];
+        const wasReload = navigation ? navigation.type === 'reload' : performance.navigation?.type === 1;
+        try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch (_) {}
+        if (!wasReload && appState.posts.some(p => p.id === targetId)) {
           setTimeout(() => openArticle(targetId), 200);
         }
       }
