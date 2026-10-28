@@ -219,6 +219,7 @@
       box-shadow: 12px 12px 0px #F7A8B8, 0 20px 45px rgba(0, 0, 0, 0.5);
       transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
       position: relative;
+      overflow: hidden;
     }
     .ak-poster-ivory::before {
       content: '';
@@ -232,11 +233,31 @@
       transition: opacity 0.35s ease;
       pointer-events: none;
     }
+    /* Hologram 扫描线效果 */
+    .ak-poster-ivory::after {
+      content: '';
+      position: absolute;
+      top: -100%;
+      left: 0;
+      right: 0;
+      height: 100%;
+      background: linear-gradient(to bottom,
+        transparent 0%,
+        rgba(142, 205, 232, 0.15) 50%,
+        transparent 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      animation: hologram-scan 3s ease-in-out infinite;
+    }
     .ak-poster-ivory:hover {
       transform: translate(-3px, -3px);
       box-shadow: 16px 16px 0px #8ECDE8, 0 25px 50px rgba(142, 205, 232, 0.28), 0 0 40px rgba(247, 168, 184, 0.15);
     }
     .ak-poster-ivory:hover::before {
+      opacity: 1;
+    }
+    .ak-poster-ivory:hover::after {
       opacity: 1;
     }
     .ak-poster-ivory:hover > svg {
@@ -327,6 +348,134 @@
     .parallax-float { animation: parallaxFloat 12s ease-in-out infinite; }
     .subtle-rotate { animation: subtleRotate 80s linear infinite; }
     .fade-pulse { animation: fadeInOut 5s ease-in-out infinite; }
+
+    /* === 极客风格升级：赛博朋克 UI === */
+    /* Glitch & Hologram 效果 */
+    @keyframes glitchSlice {
+      0%, 100% { transform: translate(0, 0) skewX(0deg); opacity: 1; }
+      15% { transform: translate(2px, 0) skewX(1deg); opacity: 0.8; }
+      30% { transform: translate(-2px, 0) skewX(-1deg); opacity: 0.9; }
+      45% { transform: translate(1px, 0) skewX(0.5deg); opacity: 0.85; }
+      60% { transform: translate(0, 0) skewX(0deg); opacity: 1; }
+    }
+    @keyframes scanline {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(100vh); }
+    }
+    @keyframes dataFlow {
+      0% { transform: translateY(0) scaleY(0); opacity: 0; }
+      25% { opacity: 0.6; }
+      50% { transform: translateY(100px) scaleY(1); opacity: 0.8; }
+      75% { opacity: 0.4; }
+      100% { transform: translateY(200px) scaleY(0); opacity: 0; }
+    }
+    @keyframes hologramFlicker {
+      0%, 100% { opacity: 0.95; filter: brightness(1); }
+      33% { opacity: 0.88; filter: brightness(1.15); }
+      66% { opacity: 0.92; filter: brightness(0.95); }
+    }
+    @keyframes hologram-scan {
+      0%, 100% { top: -100%; opacity: 0; }
+      10% { opacity: 1; }
+      50% { top: 0%; opacity: 0.8; }
+      90% { opacity: 1; }
+      100% { top: 100%; opacity: 0; }
+    }
+    .glitch-slice { animation: glitchSlice 8s ease-in-out infinite; }
+    .scanline-effect { animation: scanline 8s linear infinite; }
+    .data-flow { animation: dataFlow 6s ease-in-out infinite; }
+    .hologram-flicker { animation: hologramFlicker 3s ease-in-out infinite; }
+
+    /* 赛博朋克按钮升级 */
+    button, .btn-cyber {
+      position: relative;
+      padding: 0.7rem 1.5rem;
+      background: linear-gradient(135deg, rgba(15, 19, 28, 0.9) 0%, rgba(22, 29, 43, 0.85) 100%);
+      border: 1px solid transparent;
+      color: #8ECDE8;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+    }
+    button::before, .btn-cyber::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(142, 205, 232, 0.4), transparent);
+      transition: left 0.5s ease;
+    }
+    button::after, .btn-cyber::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(142, 205, 232, 0.15), rgba(247, 168, 184, 0.12));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: -1;
+    }
+    button:hover::before, .btn-cyber:hover::before {
+      left: 100%;
+    }
+    button:hover::after, .btn-cyber:hover::after {
+      opacity: 1;
+    }
+    button:hover, .btn-cyber:hover {
+      border-color: #8ECDE8;
+      box-shadow:
+        0 0 20px rgba(142, 205, 232, 0.5),
+        inset 0 0 15px rgba(142, 205, 232, 0.15),
+        0 4px 15px rgba(142, 205, 232, 0.25);
+      transform: translateY(-2px);
+      color: #E0F7FF;
+    }
+    button:active, .btn-cyber:active {
+      transform: translateY(0px);
+      box-shadow:
+        0 0 10px rgba(142, 205, 232, 0.4),
+        inset 0 0 10px rgba(142, 205, 232, 0.2);
+    }
+
+    /* 输入框赛博朋克升级 */
+    input[type="text"],
+    input[type="password"],
+    input[type="url"],
+    textarea {
+      background: linear-gradient(135deg, rgba(5, 19, 26, 0.9) 0%, rgba(15, 19, 28, 0.85) 100%);
+      border: 1px solid rgba(142, 205, 232, 0.3);
+      color: #E0F7FF;
+      padding: 0.75rem 1rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+    }
+    input[type="text"]:focus,
+    input[type="password"]:focus,
+    input[type="url"]:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #8ECDE8;
+      box-shadow:
+        0 0 25px rgba(142, 205, 232, 0.4),
+        inset 0 0 15px rgba(142, 205, 232, 0.08),
+        0 2px 10px rgba(142, 205, 232, 0.2);
+      background: linear-gradient(135deg, rgba(5, 19, 26, 0.95) 0%, rgba(15, 19, 28, 0.9) 100%);
+    }
+    input::placeholder,
+    textarea::placeholder {
+      color: rgba(142, 205, 232, 0.45);
+      font-style: italic;
+      letter-spacing: 0.03em;
+    }
 
     /* Arknights Page Transition Shutter */
     #shutterOverlay {
@@ -634,6 +783,20 @@
     <rect width="100%" height="100%" filter="url(#editorialGrain)" />
   </svg>
 
+  <!-- 赛博朋克 Hologram 扫描线效果 -->
+  <div class="fixed inset-0 w-full h-full pointer-events-none z-[2] overflow-hidden" aria-hidden="true">
+    <!-- 主扫描线（青色） -->
+    <div class="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent scanline-effect" style="top: -2px; filter: blur(1px);"></div>
+    <!-- 副扫描线（粉色） -->
+    <div class="absolute left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-pink-400/40 to-transparent scanline-effect" style="top: -1px; animation-delay: -4s; filter: blur(0.5px);"></div>
+
+    <!-- 数据流效果（垂直流动） -->
+    <div class="absolute top-0 left-[15%] w-[1px] h-32 bg-gradient-to-b from-cyan-400/0 via-cyan-400/50 to-cyan-400/0 data-flow" style="animation-delay: 0s;"></div>
+    <div class="absolute top-0 left-[35%] w-[1px] h-24 bg-gradient-to-b from-pink-400/0 via-pink-400/40 to-pink-400/0 data-flow" style="animation-delay: -2s;"></div>
+    <div class="absolute top-0 right-[25%] w-[1px] h-28 bg-gradient-to-b from-cyan-400/0 via-cyan-400/45 to-cyan-400/0 data-flow" style="animation-delay: -4s;"></div>
+    <div class="absolute top-0 right-[45%] w-[1px] h-20 bg-gradient-to-b from-pink-400/0 via-pink-400/35 to-pink-400/0 data-flow" style="animation-delay: -1s;"></div>
+  </div>
+
   <!-- Dynamic Cyan & Orange Geometric Planar Composition Canvas -->
   <canvas id="particleCanvas" class="fixed inset-0 w-full h-full pointer-events-none z-0"></canvas>
   <div class="fixed inset-0 bg-tech-grid pointer-events-none z-0"></div>
@@ -690,81 +853,21 @@
     <div class="hidden xl:block absolute top-0 bottom-0 right-[52px] w-px bg-cyan-400/15"></div>
   </div>
 
-  <!-- 千本樱风格：漂浮的几何光点粒子层 -->
+  <!-- 精简的几何光点层 -->
   <div class="fixed inset-0 pointer-events-none z-[1] overflow-hidden" aria-hidden="true">
-    <!-- 左上角粒子群 -->
-    <div class="absolute top-[15%] left-[8%] w-2 h-2 bg-cyan-400/60 rounded-full sparkle-particle" style="animation-delay: 0s;"></div>
-    <div class="absolute top-[22%] left-[12%] w-1.5 h-1.5 bg-pink-300/50 rounded-full sparkle-particle" style="animation-delay: 1.2s;"></div>
-    <div class="absolute top-[18%] left-[15%] w-1 h-1 bg-cyan-300/70 rounded-full sparkle-particle" style="animation-delay: 2.5s;"></div>
-    <div class="absolute top-[12%] left-[18%] w-1 h-1 bg-pink-400/55 rounded-full sparkle-particle" style="animation-delay: 3.8s;"></div>
+    <!-- 核心光点（6个，分布均匀） -->
+    <div class="absolute top-[20%] left-[10%] w-2 h-2 bg-cyan-400/50 rounded-full sparkle-particle" style="animation-delay: 0s;"></div>
+    <div class="absolute top-[35%] right-[12%] w-1.5 h-1.5 bg-pink-400/45 rounded-full sparkle-particle" style="animation-delay: 1.5s;"></div>
+    <div class="absolute bottom-[30%] left-[25%] w-1.5 h-1.5 bg-cyan-300/40 rounded-full sparkle-particle" style="animation-delay: 3s;"></div>
+    <div class="absolute top-[50%] right-[28%] w-1 h-1 bg-pink-300/50 rounded-full sparkle-particle" style="animation-delay: 2s;"></div>
+    <div class="absolute bottom-[22%] right-[20%] w-1.5 h-1.5 bg-cyan-400/45 rounded-full sparkle-particle" style="animation-delay: 2.8s;"></div>
+    <div class="absolute top-[60%] left-[40%] w-1 h-1 bg-pink-400/40 rounded-full sparkle-particle" style="animation-delay: 4s;"></div>
 
-    <!-- 右侧粒子群 -->
-    <div class="absolute top-[35%] right-[10%] w-2 h-2 bg-pink-400/60 rounded-full sparkle-particle" style="animation-delay: 0.8s;"></div>
-    <div class="absolute top-[42%] right-[15%] w-1.5 h-1.5 bg-cyan-300/50 rounded-full sparkle-particle" style="animation-delay: 2s;"></div>
-    <div class="absolute top-[38%] right-[8%] w-1 h-1 bg-pink-300/70 rounded-full sparkle-particle" style="animation-delay: 3.2s;"></div>
-    <div class="absolute top-[30%] right-[12%] w-1.5 h-1.5 bg-cyan-400/65 rounded-full sparkle-particle" style="animation-delay: 4.5s;"></div>
-
-    <!-- 中部粒子 -->
-    <div class="absolute top-[50%] left-[35%] w-1.5 h-1.5 bg-cyan-400/55 rounded-full sparkle-particle" style="animation-delay: 1.8s;"></div>
-    <div class="absolute top-[55%] right-[30%] w-1 h-1 bg-pink-400/60 rounded-full sparkle-particle" style="animation-delay: 2.3s;"></div>
-    <div class="absolute top-[48%] left-[42%] w-1 h-1 bg-cyan-300/50 rounded-full sparkle-particle" style="animation-delay: 3.7s;"></div>
-
-    <!-- 底部粒子群 -->
-    <div class="absolute bottom-[25%] left-[20%] w-1.5 h-1.5 bg-cyan-400/60 rounded-full sparkle-particle" style="animation-delay: 1.5s;"></div>
-    <div class="absolute bottom-[30%] left-[25%] w-1 h-1 bg-pink-300/50 rounded-full sparkle-particle" style="animation-delay: 2.8s;"></div>
-    <div class="absolute bottom-[20%] right-[22%] w-1.5 h-1.5 bg-cyan-300/55 rounded-full sparkle-particle" style="animation-delay: 3.5s;"></div>
-    <div class="absolute bottom-[28%] right-[18%] w-1 h-1 bg-pink-400/60 rounded-full sparkle-particle" style="animation-delay: 4.2s;"></div>
-
-    <!-- 物语系列意识流几何碎片 -->
-    <svg class="absolute top-[28%] left-[35%] w-16 h-16 opacity-20 fragment-drift" viewBox="0 0 64 64" fill="none">
-      <path d="M32 8 L56 32 L32 56 L8 32 Z" stroke="#8ECDE8" stroke-width="1" fill="rgba(142, 205, 232, 0.1)" />
-      <circle cx="32" cy="32" r="8" fill="#F7A8B8" opacity="0.6" />
+    <!-- 呼吸大圆环（乔布斯式极简） -->
+    <svg class="absolute top-[40%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] opacity-8 breathe-slow" viewBox="0 0 400 400" fill="none">
+      <circle cx="200" cy="200" r="180" stroke="#8ECDE8" stroke-width="0.4" />
+      <circle cx="200" cy="200" r="140" stroke="#F7A8B8" stroke-width="0.4" stroke-dasharray="8 8" />
     </svg>
-    <svg class="absolute top-[60%] right-[25%] w-12 h-12 opacity-25 fragment-drift" style="animation-delay: -3s;" viewBox="0 0 48 48" fill="none">
-      <circle cx="24" cy="24" r="20" stroke="#F7A8B8" stroke-width="1" stroke-dasharray="4 4" fill="rgba(247, 168, 184, 0.08)" />
-      <circle cx="24" cy="24" r="6" fill="#8ECDE8" />
-    </svg>
-    <svg class="absolute bottom-[35%] left-[45%] w-14 h-14 opacity-18 fragment-drift" style="animation-delay: -5s;" viewBox="0 0 56 56" fill="none">
-      <rect x="10" y="10" width="36" height="36" stroke="#8ECDE8" stroke-width="1" transform="rotate(45 28 28)" fill="rgba(142, 205, 232, 0.06)" />
-      <circle cx="28" cy="28" r="5" fill="#F7A8B8" opacity="0.7" />
-    </svg>
-
-    <!-- 新增：物语系列斜切文字框架风格几何 -->
-    <svg class="absolute top-[20%] right-[35%] w-24 h-24 opacity-15 monogatari-slice" viewBox="0 0 96 96" fill="none">
-      <path d="M20 10 L80 20 L76 86 L16 76 Z" stroke="#8ECDE8" stroke-width="0.8" fill="rgba(142, 205, 232, 0.05)" />
-      <line x1="20" y1="10" x2="76" y2="86" stroke="#F7A8B8" stroke-width="0.5" stroke-dasharray="3 3" />
-    </svg>
-    <svg class="absolute bottom-[45%] left-[15%] w-20 h-20 opacity-18 monogatari-slice" style="animation-delay: -2s;" viewBox="0 0 80 80" fill="none">
-      <path d="M10 30 L70 25 L75 55 L15 60 Z" stroke="#F7A8B8" stroke-width="0.8" fill="rgba(247, 168, 184, 0.06)" />
-      <circle cx="40" cy="42" r="8" stroke="#8ECDE8" stroke-width="0.6" fill="none" />
-    </svg>
-
-    <!-- 呼吸动画的大圆环（乔布斯式极简） -->
-    <svg class="absolute top-[40%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] opacity-10 breathe-slow" viewBox="0 0 400 400" fill="none">
-      <circle cx="200" cy="200" r="180" stroke="#8ECDE8" stroke-width="0.5" />
-      <circle cx="200" cy="200" r="140" stroke="#F7A8B8" stroke-width="0.5" stroke-dasharray="8 8" />
-      <circle cx="200" cy="200" r="100" stroke="#8ECDE8" stroke-width="0.3" />
-    </svg>
-
-    <!-- 视差漂浮的小几何点缀 -->
-    <div class="absolute top-[65%] left-[60%] w-3 h-3 border border-cyan-400/40 rotate-45 parallax-float" style="animation-delay: -1s;"></div>
-    <div class="absolute top-[70%] right-[40%] w-2 h-2 border border-pink-400/40 parallax-float" style="animation-delay: -3s;"></div>
-    <div class="absolute bottom-[15%] left-[55%] w-2.5 h-2.5 border border-cyan-300/35 rotate-45 parallax-float" style="animation-delay: -5s;"></div>
-
-    <!-- 缓慢旋转的装饰线条（意识流风格） -->
-    <svg class="absolute top-[10%] left-[25%] w-32 h-32 opacity-12 subtle-rotate" viewBox="0 0 128 128" fill="none">
-      <path d="M64 10 Q90 40 64 70 Q38 40 64 10" stroke="#8ECDE8" stroke-width="0.8" fill="none" />
-      <path d="M64 58 Q90 88 64 118 Q38 88 64 58" stroke="#F7A8B8" stroke-width="0.8" fill="none" />
-    </svg>
-    <svg class="absolute bottom-[10%] right-[15%] w-28 h-28 opacity-10 subtle-rotate" style="animation-direction: reverse;" viewBox="0 0 112 112" fill="none">
-      <line x1="10" y1="10" x2="102" y2="102" stroke="#F7A8B8" stroke-width="0.6" />
-      <line x1="102" y1="10" x2="10" y2="102" stroke="#8ECDE8" stroke-width="0.6" />
-      <circle cx="56" cy="56" r="35" stroke="#8ECDE8" stroke-width="0.5" stroke-dasharray="4 4" />
-    </svg>
-
-    <!-- 渐显渐隐的抽象光带 -->
-    <div class="absolute top-0 left-[20%] w-px h-full bg-gradient-to-b from-transparent via-cyan-400/20 to-transparent fade-pulse"></div>
-    <div class="absolute top-0 right-[30%] w-px h-full bg-gradient-to-b from-transparent via-pink-400/15 to-transparent fade-pulse" style="animation-delay: -2.5s;"></div>
   </div>
 
   <!-- Fixed Left Editorial Spine (Swiss Magazine / Eagle Point Graphic Identity) -->
@@ -852,29 +955,35 @@
 
       <!-- Desktop Navigation Tabs (5 Iconic Modules from 众生行记) -->
       <nav class="hidden lg:flex items-center gap-1">
-        <button onclick="switchSection('sanctuary')" id="nav-sanctuary" class="nav-tab px-3.5 py-2 text-xs font-mono tracking-wider transition-all ak-clip-btn flex items-center gap-2 bg-cyan-500/20 text-cyan-300 border-b-2 border-[#F7A8B8]">
-          <span class="font-display text-[#F7A8B8] font-black">01</span>
-          <span>瞻望圣堂</span>
+        <button onclick="switchSection('sanctuary')" id="nav-sanctuary" class="nav-tab px-3.5 py-2 text-xs font-mono tracking-wider transition-all ak-clip-btn flex items-center gap-2 bg-cyan-500/20 text-cyan-300 border-b-2 border-[#F7A8B8] relative overflow-hidden group backdrop-blur-sm">
+          <span class="font-display text-[#F7A8B8] font-black relative z-10">01</span>
+          <span class="relative z-10">瞻望圣堂</span>
+          <span class="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/20 to-cyan-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
         </button>
-        <button onclick="switchSection('audience')" id="nav-audience" class="nav-tab px-3.5 py-2 text-xs font-mono tracking-wider transition-all ak-clip-btn flex items-center gap-2 hover:bg-cyan-500/10 text-slate-300">
-          <span class="font-display text-cyan-400 font-black">02</span>
-          <span>谒见神祇·归档</span>
+        <button onclick="switchSection('audience')" id="nav-audience" class="nav-tab px-3.5 py-2 text-xs font-mono tracking-wider transition-all ak-clip-btn flex items-center gap-2 hover:bg-cyan-500/10 text-slate-300 relative overflow-hidden group backdrop-blur-sm">
+          <span class="font-display text-cyan-400 font-black relative z-10">02</span>
+          <span class="relative z-10">谒见神祇·归档</span>
+          <span class="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-500/15 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
         </button>
-        <button onclick="switchSection('workshop')" id="nav-workshop" class="nav-tab px-3.5 py-2 text-xs font-mono tracking-wider transition-all ak-clip-btn flex items-center gap-2 hover:bg-cyan-500/10 text-slate-300">
-          <span class="font-display text-[#F7A8B8] font-black">03</span>
-          <span>制铳师之夜·工坊</span>
+        <button onclick="switchSection('workshop')" id="nav-workshop" class="nav-tab px-3.5 py-2 text-xs font-mono tracking-wider transition-all ak-clip-btn flex items-center gap-2 hover:bg-cyan-500/10 text-slate-300 relative overflow-hidden group backdrop-blur-sm">
+          <span class="font-display text-[#F7A8B8] font-black relative z-10">03</span>
+          <span class="relative z-10">制铳师之夜·工坊</span>
+          <span class="absolute inset-0 bg-gradient-to-r from-transparent via-pink-500/15 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
         </button>
-        <button onclick="switchSection('metrics')" id="nav-metrics" class="nav-tab px-3.5 py-2 text-xs font-mono tracking-wider transition-all ak-clip-btn flex items-center gap-2 hover:bg-cyan-500/10 text-slate-300">
-          <span class="font-display text-cyan-400 font-black">04</span>
-          <span>哄睡指标·蚀刻章</span>
+        <button onclick="switchSection('metrics')" id="nav-metrics" class="nav-tab px-3.5 py-2 text-xs font-mono tracking-wider transition-all ak-clip-btn flex items-center gap-2 hover:bg-cyan-500/10 text-slate-300 relative overflow-hidden group backdrop-blur-sm">
+          <span class="font-display text-cyan-400 font-black relative z-10">04</span>
+          <span class="relative z-10">哄睡指标·蚀刻章</span>
+          <span class="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-500/15 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
         </button>
-        <button onclick="switchSection('resting')" id="nav-resting" class="nav-tab px-3.5 py-2 text-xs font-mono tracking-wider transition-all ak-clip-btn flex items-center gap-2 hover:bg-cyan-500/10 text-slate-300">
-          <span class="font-display text-[#F7A8B8] font-black">05</span>
-          <span>息止安所·告解</span>
+        <button onclick="switchSection('resting')" id="nav-resting" class="nav-tab px-3.5 py-2 text-xs font-mono tracking-wider transition-all ak-clip-btn flex items-center gap-2 hover:bg-cyan-500/10 text-slate-300 relative overflow-hidden group backdrop-blur-sm">
+          <span class="font-display text-[#F7A8B8] font-black relative z-10">05</span>
+          <span class="relative z-10">息止安所·告解</span>
+          <span class="absolute inset-0 bg-gradient-to-r from-transparent via-pink-500/15 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
         </button>
-        <button onclick="switchSection('cloudflare')" id="nav-cloudflare" class="nav-tab px-3.5 py-2 text-xs font-mono tracking-wider transition-all ak-clip-btn flex items-center gap-1.5 hover:bg-cyan-500/10 text-pink-200 border border-[#F7A8B8]/40">
-          <span class="font-display text-cyan-400 font-black">06</span>
-          <span>☁️ CF部署与CMS</span>
+        <button onclick="switchSection('cloudflare')" id="nav-cloudflare" class="nav-tab px-3.5 py-2 text-xs font-mono tracking-wider transition-all ak-clip-btn flex items-center gap-1.5 hover:bg-cyan-500/10 text-pink-200 border border-[#F7A8B8]/40 relative overflow-hidden group backdrop-blur-sm">
+          <span class="font-display text-cyan-400 font-black relative z-10">06</span>
+          <span class="relative z-10">☁️ CF部署与CMS</span>
+          <span class="absolute inset-0 bg-gradient-to-r from-pink-500/0 via-pink-500/20 to-pink-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
         </button>
       </nav>
 
@@ -1083,13 +1192,16 @@
                 <div class="font-display text-xs tracking-[0.35em] text-[#F7A8B8] font-bold uppercase">
                   CONSTRUCTIVIST GRAPHIC CHRONICLE // 众生行记 × 平面构成志
                 </div>
-                <h1 class="font-serif text-3xl sm:text-5xl font-black tracking-tight text-[#F3EFE6] leading-[1.12]">
-                  一个圆的<span class="bg-[#F7A8B8] text-[#041016] px-2.5 py-0.5 inline-block transform -skew-x-6">百种解构</span>与<br/>
-                  <span class="text-cyan-300">青与淡粉神圣几何</span>实验场
+                <h1 class="font-serif text-3xl sm:text-5xl font-black tracking-tight text-[#F3EFE6] leading-[1.12] relative glitch-slice hologram-flicker">
+                  一个圆的<span class="bg-[#F7A8B8] text-[#041016] px-2.5 py-0.5 inline-block transform -skew-x-6 transition-all duration-300 hover:skew-x-0 hover:scale-110 hover:shadow-[0_0_20px_rgba(247,168,184,0.6)]">百种解构</span>与<br/>
+                  <span class="text-cyan-300 relative inline-block">
+                    青与淡粉神圣几何
+                    <span class="absolute inset-0 bg-gradient-to-r from-cyan-400/0 via-cyan-400/30 to-cyan-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></span>
+                  </span>实验场
                 </h1>
               </div>
               <!-- Stamp Seal Graphic -->
-              <div class="shrink-0 border-2 border-[#F7A8B8] p-2 text-center bg-[#041016]/90 rotate-[-3deg]">
+              <div class="shrink-0 border-2 border-[#F7A8B8] p-2 text-center bg-[#041016]/90 rotate-[-3deg] transition-all duration-500 hover:rotate-0 hover:scale-110 hover:border-cyan-400 hover:shadow-[0_0_30px_rgba(142,205,232,0.5)] cursor-pointer">
                 <div class="font-display text-[9px] tracking-[0.2em] text-cyan-300">PURE GEOMETRY</div>
                 <div class="font-serif font-black text-sm text-[#F7A8B8] tracking-widest">平面构成美学</div>
                 <div class="font-mono text-[8px] text-[#F3EFE6]">NO RASTER // SVG</div>
@@ -1101,14 +1213,17 @@
             </p>
 
             <div class="flex flex-wrap items-center gap-3 pt-1">
-              <button onclick="openArticle('post-1')" class="px-6 py-3 text-xs sm:text-sm font-mono font-black bg-[#F3EFE6] text-[#041016] hover:bg-[#F7A8B8] hover:text-[#05131A] transition-all shadow-[5px_5px_0px_#8ECDE8]">
-                ▶ 阅读核心拆解报告
+              <button onclick="openArticle('post-1')" class="relative px-6 py-3 text-xs sm:text-sm font-mono font-black bg-[#F3EFE6] text-[#041016] overflow-hidden group transition-all shadow-[5px_5px_0px_#8ECDE8] hover:shadow-[7px_7px_0px_#F7A8B8] hover:-translate-x-0.5 hover:-translate-y-0.5">
+                <span class="relative z-10">▶ 阅读核心拆解报告</span>
+                <span class="absolute inset-0 bg-gradient-to-r from-[#F7A8B8] to-cyan-400 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></span>
               </button>
-              <button onclick="switchSection('workshop')" class="px-5 py-3 text-xs sm:text-sm font-mono font-bold bg-[#F7A8B8] text-[#041016] hover:bg-cyan-400 transition-all">
-                ☕ 进入制铳师咖啡工坊
+              <button onclick="switchSection('workshop')" class="relative px-5 py-3 text-xs sm:text-sm font-mono font-bold bg-[#F7A8B8] text-[#041016] overflow-hidden group transition-all">
+                <span class="relative z-10">☕ 进入制铳师咖啡工坊</span>
+                <span class="absolute inset-0 bg-cyan-400 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300"></span>
               </button>
-              <button onclick="switchSection('audience')" class="px-4 py-3 text-xs font-mono text-cyan-300 border border-cyan-400/50 hover:bg-cyan-400/15 transition-all">
-                浏览全部 <span id="heroTotalPostsCount">6</span> 篇档案 →
+              <button onclick="switchSection('audience')" class="relative px-4 py-3 text-xs font-mono text-cyan-300 border border-cyan-400/50 overflow-hidden group transition-all hover:text-[#041016] hover:border-cyan-400">
+                <span class="relative z-10">浏览全部 <span id="heroTotalPostsCount">6</span> 篇档案 →</span>
+                <span class="absolute inset-0 bg-cyan-400 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
               </button>
             </div>
           </div>
