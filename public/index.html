@@ -292,7 +292,7 @@
         <button id="levelBadgeBtn" type="button" title="点击进入灵境查看十阶等级图谱与经验任务" class="hidden sm:flex flex-col justify-center px-2.5 py-1 rounded-full bg-[#0A0908]/85 border border-[#D96B38]/45 hover:border-[#D96B38] transition shrink-0 whitespace-nowrap group">
           <div class="flex items-center gap-1.5 text-[11px] font-mono leading-none">
             <span class="w-1.5 h-1.5 rounded-full bg-[#D96B38]"></span>
-            <span id="headerLevelText" class="text-[#F3E9D2] font-bold">Lv.3 切线观测者</span>
+            <span id="headerLevelText" class="text-[#F3E9D2] font-bold">Lv.1 初始顶点</span>
             <span id="headerExpText" class="text-[10px] text-[#D96B38]">340/450</span>
           </div>
           <div class="w-full h-0.5 bg-[#1A1614] rounded-full overflow-hidden mt-1">
@@ -948,14 +948,14 @@
             <div class="flex items-center gap-4">
               <div id="spiritLevelOrb" class="w-16 h-16 rounded-2xl bg-[#D96B38]/20 border-2 border-[#D96B38] flex flex-col items-center justify-center font-mono shrink-0 shadow-lg">
                 <span class="text-[10px] text-[#C8BCA3]">RANK</span>
-                <span id="spiritCurrentLvNum" class="text-xl font-bold text-[#D96B38]">Lv.3</span>
+                <span id="spiritCurrentLvNum" class="text-xl font-bold text-[#D96B38]">Lv.1</span>
               </div>
               <div class="space-y-1">
                 <div class="flex flex-wrap items-center gap-2">
-                  <h3 id="spiritCurrentLvTitle" class="text-xl font-serif font-bold text-[#F3E9D2]">Lv.3 切线观测者 · Observer</h3>
-                  <span id="spiritCurrentLvPerk" class="px-2.5 py-0.5 rounded-full bg-[#D96B38]/20 border border-[#D96B38]/40 text-[11px] font-mono text-[#D96B38]">已解锁三阶铭牌</span>
+                  <h3 id="spiritCurrentLvTitle" class="text-xl font-serif font-bold text-[#F3E9D2]">Lv.1 初始顶点 · Point Set</h3>
+                  <span id="spiritCurrentLvPerk" class="px-2.5 py-0.5 rounded-full bg-[#D96B38]/20 border border-[#D96B38]/40 text-[11px] font-mono text-[#D96B38]">解锁基础访客铭牌</span>
                 </div>
-                <p id="spiritCurrentLvDesc" class="text-xs text-[#C8BCA3]">在正弦波与切线流形之间穿行的观测者。</p>
+                <p id="spiritCurrentLvDesc" class="text-xs text-[#C8BCA3]">初入绒芙咖啡的离散坐标点，一切故事的起点。</p>
               </div>
             </div>
 
@@ -978,11 +978,11 @@
           <div class="grid grid-cols-1 md:grid-cols-12 gap-4 pt-2">
             <div class="md:col-span-8 space-y-1.5">
               <div class="flex items-center justify-between text-xs font-mono">
-                <span id="spiritExpNumbersText" class="text-[#F3E9D2] font-bold">当前经验: 340 EXP</span>
-                <span id="spiritNextLevelHintText" class="text-[#D96B38]">距离下一级「Lv.4 正弦共鸣师」还需 110 EXP (75%)</span>
+                <span id="spiritExpNumbersText" class="text-[#F3E9D2] font-bold">当前经验: 0 EXP</span>
+                <span id="spiritNextLevelHintText" class="text-[#D96B38]">距离下一级「Lv.2 几何切线」还需 100 EXP (0%)</span>
               </div>
               <div class="w-full h-3 bg-[#161311] rounded-full overflow-hidden border border-[#D96B38]/35 p-0.5">
-                <div id="spiritExpBarFill" class="h-full rounded-full bg-gradient-to-r from-[#D96B38] via-[#E88352] to-[#F3E9D2] transition-all duration-500" style="width: 75%"></div>
+                <div id="spiritExpBarFill" class="h-full rounded-full bg-gradient-to-r from-[#D96B38] via-[#E88352] to-[#F3E9D2] transition-all duration-500" style="width: 0%"></div>
               </div>
             </div>
             <div class="md:col-span-4 space-y-1.5 bg-[#12100E] px-3.5 py-2 rounded-xl border border-[#D96B38]/25">
@@ -2068,7 +2068,7 @@ If I'm a sine wave, then you can sit on all my tangents</textarea>
       momentsSort: 'latest',
       chatterTag: '全部',
       levelSystemEnabled: true,
-      exp: 340,
+      exp: 0,
       dailyExpCap: 200,
       dailyExpDate: '',
       dailyExpEarned: 0,
@@ -2119,7 +2119,16 @@ If I'm a sine wave, then you can sit on all my tangents</textarea>
         if(previousData !== null) localStorage.setItem('rongfu_claude_blog_data_v3', previousData);
         const savedState = localStorage.getItem('rongfu_claude_blog_state_v3');
         if (savedState) {
-          state = { ...state, ...JSON.parse(savedState), isPlaying: false };
+          const saved = JSON.parse(savedState);
+          // The earlier template seeded untouched visitors with 340 EXP.
+          // Keep other saved totals: they may represent real progress.
+          if (saved.exp === 340 && !saved.dailyExpEarned && !saved.expDefaultCorrected) {
+            try { localStorage.setItem('rongfu_level_before_default_fix', savedState); } catch (_) {}
+            saved.exp = 0;
+            saved.expDefaultCorrected = true;
+            localStorage.setItem('rongfu_claude_blog_state_v3', JSON.stringify(saved));
+          }
+          state = { ...state, ...saved, isPlaying: false };
         }
         const savedData = localStorage.getItem('rongfu_claude_blog_data_v3');
         if (savedData) {
