@@ -3434,7 +3434,10 @@ If I'm a sine wave, then you can sit on all my tangents</textarea>
         }).catch(err => {
           state.isPlaying = false;
           renderMusicStudio();
-          showToast('[提示] 音频无法播放，请检查文件格式');
+          if (err.name === 'AbortError') return;
+          const message = err.name === 'NotAllowedError' ? '浏览器限制自动播放，请点击播放按钮听音乐' : '音乐暂时无法播放，请检查网络或音频格式';
+          document.getElementById('homeMusicLyricLine').textContent = message;
+          showToast(message);
         });
       } else {
         renderMusicStudio();
@@ -3460,7 +3463,10 @@ If I'm a sine wave, then you can sit on all my tangents</textarea>
         audioEl.play().then(() => {
           state.isPlaying = true;
           renderMusicStudio();
-        }).catch(() => {});
+        }).catch(err => {
+          state.isPlaying = false; renderMusicStudio();
+          if (err.name !== 'AbortError') showToast(err.name === 'NotAllowedError' ? '请点击播放按钮允许播放音乐' : '音乐暂时无法播放，请检查网络或音频格式');
+        });
       }
     }
 
