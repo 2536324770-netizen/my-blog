@@ -3366,6 +3366,7 @@ If I'm a sine wave, then you can sit on all my tangents</textarea>
             const idx = parseInt(btn.getAttribute('data-remove-track'), 10);
             tracksData.splice(idx, 1);
             if (tracksData.length === 0) {
+              ++playbackRequestId; playbackRequested = false;
               audioEl.pause();
               audioEl.removeAttribute('src');
               state.isPlaying = false;
@@ -3414,11 +3415,15 @@ If I'm a sine wave, then you can sit on all my tangents</textarea>
       }
     }
 
+    let playbackRequestId = 0;
+    let playbackRequested = false;
     function loadAndPlayTrack(index, autoPlay = true) {
       if (tracksData.length === 0) {
         showToast('[提示] 请先导入本地音乐文件');
         return;
       }
+      const requestId = ++playbackRequestId;
+      playbackRequested = autoPlay;
       state.currentTrackIndex = (index + tracksData.length) % tracksData.length;
       const trk = tracksData[state.currentTrackIndex];
       const audioEl = document.getElementById('localAudioElement');
@@ -3426,12 +3431,16 @@ If I'm a sine wave, then you can sit on all my tangents</textarea>
         audioEl.src = trk.url;
         audioEl.setAttribute('data-track-id', trk.id);
       }
+      renderMusicStudio();
       if (autoPlay) {
         audioEl.play().then(() => {
+          if (requestId !== playbackRequestId) return;
           state.isPlaying = true;
           document.getElementById('homeMusicLyricLine').textContent = `正在播放: ${trk.title}`;
           renderMusicStudio();
         }).catch(err => {
+          if (requestId !== playbackRequestId) return;
+          playbackRequested = false;
           state.isPlaying = false;
           renderMusicStudio();
           if (err.name === 'AbortError') return;
@@ -3455,18 +3464,13 @@ If I'm a sine wave, then you can sit on all my tangents</textarea>
         loadAndPlayTrack(state.currentTrackIndex, true);
         return;
       }
-      if (state.isPlaying) {
+      if (state.isPlaying || playbackRequested) {
+        ++playbackRequestId; playbackRequested = false;
         audioEl.pause();
         state.isPlaying = false;
         renderMusicStudio();
       } else {
-        audioEl.play().then(() => {
-          state.isPlaying = true;
-          renderMusicStudio();
-        }).catch(err => {
-          state.isPlaying = false; renderMusicStudio();
-          if (err.name !== 'AbortError') showToast(err.name === 'NotAllowedError' ? '请点击播放按钮允许播放音乐' : '音乐暂时无法播放，请检查网络或音频格式');
-        });
+        loadAndPlayTrack(state.currentTrackIndex, true);
       }
     }
 
@@ -3853,7 +3857,7 @@ If I'm a sine wave, then you can sit on all my tangents</textarea>
       audioEl.addEventListener('ended', () => {
         if (state.loopMode === 'single') {
           audioEl.currentTime = 0;
-          audioEl.play();
+          loadAndPlayTrack(state.currentTrackIndex, true);
         } else if (tracksData.length > 0) {
           const next=state.loopMode==='shuffle' && tracksData.length>1 ? (state.currentTrackIndex+1+Math.floor(Math.random()*(tracksData.length-1)))%tracksData.length : (state.currentTrackIndex + 1) % tracksData.length;
           loadAndPlayTrack(next, true);
@@ -3915,6 +3919,7 @@ If I'm a sine wave, then you can sit on all my tangents</textarea>
       document.getElementById('clearPlaylistBtn').addEventListener('click', () => {
         tracksData = [];
         lrcLines = [];
+        ++playbackRequestId; playbackRequested = false;
         audioEl.pause();
         audioEl.removeAttribute('src');
         state.isPlaying = false;
