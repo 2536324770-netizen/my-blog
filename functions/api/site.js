@@ -46,7 +46,12 @@ export async function onRequest({ request, env }) {
     let body; try { body = JSON.parse(new TextDecoder().decode(bytes)); } catch (_) { return reply({ error: '请求格式错误' }, 400); }
     const data = body?.data;
     if (!Number.isSafeInteger(body?.revision) || body.revision < 0 || !data || !Array.isArray(data.posts) || !Array.isArray(data.friendLinks) || !Array.isArray(data.projects) || !Array.isArray(data.socialLinks) || !data.siteSettings || typeof data.siteSettings !== 'object' || Array.isArray(data.siteSettings)) return reply({ error: '网站数据格式错误' }, 400);
-    const content = JSON.stringify({ posts: data.posts, friendLinks: data.friendLinks, projects: data.projects, socialLinks: data.socialLinks, siteSettings: data.siteSettings, anime: Array.isArray(data.anime) ? data.anime : [] });
+    let redesign = data.redesign && typeof data.redesign === 'object' && !Array.isArray(data.redesign) ? data.redesign : null;
+    if (!redesign && body.revision > 0) {
+      const current = await env.GUESTBOOK_DB.prepare('SELECT revision, content FROM site_content WHERE id = 1').first();
+      if (current?.revision === body.revision) { try { redesign = JSON.parse(current.content).redesign || {}; } catch (_) {} }
+    }
+    const content = JSON.stringify({ posts: data.posts, friendLinks: data.friendLinks, projects: data.projects, socialLinks: data.socialLinks, siteSettings: data.siteSettings, anime: Array.isArray(data.anime) ? data.anime : [], redesign: redesign || {} });
     const now = new Date().toISOString();
     let result;
     if (body.revision === 0) {
