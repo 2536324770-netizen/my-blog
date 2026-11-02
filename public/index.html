@@ -4762,27 +4762,68 @@ If I'm a sine wave, then you can sit on all my tangents</textarea>
   petLayer.style.cssText = 'position:fixed;inset:0;z-index:2147483000;pointer-events:none';
   document.body.append(petLayer, controls);
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let activeTouch = null;
+  function enableTouch(mascot) {
+    const root = mascot.engine.elRoot;
+    if (!root) return () => {};
+    root.style.touchAction = 'none';
+    const listeners = new AbortController();
+    const signal = listeners.signal;
+    const send = (target, type, touch, buttons) => target.dispatchEvent(new MouseEvent(type, {
+      bubbles: true, cancelable: true, view: window, button: 0, buttons,
+      clientX: touch.clientX, clientY: touch.clientY
+    }));
+    root.addEventListener('touchstart', event => {
+      if (activeTouch || event.changedTouches.length !== 1) return;
+      const touch = event.changedTouches[0];
+      activeTouch = { identifier: touch.identifier, root, x: touch.clientX, y: touch.clientY };
+      event.preventDefault();
+      send(root, 'mousedown', touch, 1);
+    }, { passive: false, signal });
+    window.addEventListener('touchmove', event => {
+      if (!activeTouch || activeTouch.root !== root) return;
+      const touch = Array.from(event.changedTouches).find(t => t.identifier === activeTouch.identifier);
+      if (!touch) return;
+      event.preventDefault(); activeTouch.x = touch.clientX; activeTouch.y = touch.clientY;
+      send(window, 'mousemove', touch, 1);
+    }, { passive: false, signal });
+    const finish = event => {
+      if (!activeTouch || activeTouch.root !== root) return;
+      const touch = Array.from(event.changedTouches).find(t => t.identifier === activeTouch.identifier);
+      if (!touch) return;
+      event.preventDefault(); activeTouch = null;
+      send(window, 'mouseup', touch, 0);
+    };
+    window.addEventListener('touchend', finish, { passive: false, signal });
+    window.addEventListener('touchcancel', finish, { passive: false, signal });
+    return () => {
+      if (activeTouch && activeTouch.root === root) { const last = {clientX: activeTouch.x, clientY: activeTouch.y}; activeTouch = null; send(window, 'mouseup', last, 0); }
+      listeners.abort();
+    };
+  }
   for (const [pack, key] of [['Neuron','rongfu_web_mascot_enabled'], ['Eviling','rongfu_web_mascot_eviling_enabled']]) {
     const button = document.createElement('button'); button.type = 'button';
     button.id = pack === 'Neuron' ? 'web-mascot-toggle' : 'web-mascot-eviling-toggle';
     button.style.cssText = 'padding:7px 10px;border:1px solid #d96b38;border-radius:10px;background:#12100e;color:#f3e9d2;font:12px sans-serif;cursor:pointer;box-shadow:0 4px 16px #0008';
     controls.append(button);
-    let mascot = null, operation = 0, enabled = false;
+    let mascot = null, removeTouch = null, operation = 0, enabled = false;
     try { const saved = localStorage.getItem(key); enabled = saved === null ? !reducedMotion : saved === '1'; } catch (_) { enabled = !reducedMotion; }
     function label() { button.textContent = (enabled ? '隐藏 ' : '显示 ') + pack; button.setAttribute('aria-label', (enabled ? '隐藏 ' : '显示 ') + pack + ' 桌宠'); button.setAttribute('aria-pressed', String(enabled)); }
     async function update() {
       const request = ++operation; label();
-      if (!enabled) { if (mascot) { mascot.destroy(); mascot = null; } return; }
+      if (!enabled) { if (mascot) { if (removeTouch) removeTouch(); removeTouch = null; mascot.destroy(); mascot = null; } return; }
       if (mascot) return;
       try {
         const created = await createMascot({ container: petLayer, pack });
-        if (request !== operation || !enabled) created.destroy(); else mascot = created;
+        if (request !== operation || !enabled) created.destroy(); else { mascot = created; removeTouch = enableTouch(created); }
       } catch (error) {
         if (request !== operation) return;
         enabled = false; label(); button.title = '桌宠加载失败，可点击重试'; console.warn('桌宠加载失败', error);
       }
     }
     button.addEventListener('click', () => { enabled = !enabled; try { localStorage.setItem(key, enabled ? '1' : '0'); } catch (_) {} update(); });
+    button.addEventListener('touchstart', event => { if (event.touches.length === 1) event.preventDefault(); }, { passive: false });
+    button.addEventListener('touchend', event => { if (event.changedTouches.length !== 1) return; event.preventDefault(); const touch=event.changedTouches[0]; const rect=button.getBoundingClientRect(); if (touch.clientX >= rect.left && touch.clientX <= rect.right && touch.clientY >= rect.top && touch.clientY <= rect.bottom) button.click(); }, { passive: false });
     update();
   }
 </script>
