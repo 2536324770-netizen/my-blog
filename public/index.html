@@ -4752,5 +4752,38 @@ If I'm a sine wave, then you can sit on all my tangents</textarea>
       });
     };
   </script>
+<script type="module" id="web-mascot-integration">
+  import { configure, createMascot } from '/vendor/web-mascot/index.js';
+  configure({ assets: '/vendor/web-mascot/mascot_pack', animationConfigUrl: '/vendor/web-mascot/animation.config.json' });
+  const button = document.createElement('button');
+  button.type = 'button'; button.id = 'web-mascot-toggle';
+  button.setAttribute('aria-label', '显示或隐藏网页桌宠');
+  button.style.cssText = 'position:fixed;left:12px;bottom:12px;z-index:30;padding:8px 12px;border:1px solid #d96b38;border-radius:12px;background:#12100e;color:#f3e9d2;font:12px sans-serif;cursor:pointer;box-shadow:0 4px 16px #0008';
+  document.body.append(button);
+  const petLayer = document.createElement('div'); petLayer.id = 'web-mascot-layer';
+  petLayer.style.cssText = 'position:fixed;inset:0;z-index:25;pointer-events:none';
+  document.body.append(petLayer);
+  let mascot = null, operation = 0;
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let enabled = false;
+  try { const saved = localStorage.getItem('rongfu_web_mascot_enabled'); enabled = saved === null ? !reducedMotion : saved === '1'; } catch (_) { enabled = !reducedMotion; }
+  function label() { button.textContent = enabled ? '隐藏桌宠' : '显示桌宠'; button.setAttribute('aria-pressed', String(enabled)); }
+  async function update() {
+    const request = ++operation; label();
+    if (!enabled) { if (mascot) { mascot.destroy(); mascot = null; } return; }
+    if (mascot) return;
+    try {
+      const created = await createMascot({ container: petLayer, pack: 'Neuron' });
+      if (request !== operation || !enabled) created.destroy(); else mascot = created;
+    } catch (error) {
+      if (request !== operation) return;
+      enabled = false; label();
+      button.title = '桌宠加载失败，可点击重试';
+      console.warn('桌宠加载失败', error);
+    }
+  }
+  button.addEventListener('click', () => { enabled = !enabled; try { localStorage.setItem('rongfu_web_mascot_enabled', enabled ? '1' : '0'); } catch (_) {} update(); });
+  update();
+</script>
 </body>
 </html>

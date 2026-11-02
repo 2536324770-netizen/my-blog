@@ -1,0 +1,81 @@
+{
+  "name": "web-mascot",
+  "version": "0.0.3",
+  "private": false,
+  "type": "module",
+  "description": "Embeddable browser mascot engine: run Shimeji-format mascot packs inside any web page (NeurolingsCE-Qt web port).",
+  "keywords": [
+    "mascot",
+    "shimeji",
+    "shimeji-ee",
+    "desktop-pet",
+    "pet",
+    "browser",
+    "web",
+    "embed",
+    "sprite",
+    "animation",
+    "typescript",
+    "neurolings"
+  ],
+  "license": "SEE LICENSE IN LICENSE",
+  "author": "CommentOut64",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CommentOut64/web-mascot.git",
+    "directory": "web-mascot"
+  },
+  "homepage": "https://github.com/CommentOut64/web-mascot/tree/HEAD/web-mascot#readme",
+  "bugs": {
+    "url": "https://github.com/CommentOut64/web-mascot/issues"
+  },
+  "sideEffects": [
+    "./dist/index.js",
+    "./dist/devtools.js"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./devtools": {
+      "types": "./dist/types/devtools.d.ts",
+      "import": "./dist/devtools.js",
+      "default": "./dist/devtools.js"
+    },
+    "./animation.config.json": "./dist/animation.config.json",
+    "./mascot_pack": "./dist/mascot_pack",
+    "./mascot_pack/*": "./dist/mascot_pack/*",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "docs",
+    "src/core",
+    "src/dev",
+    "src/index.ts",
+    "src/devtools.ts",
+    "ANIMATION_CONFIG.md",
+    "NOTICE"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "build:lib": "vue-tsc && vite build && tsc -p tsconfig.lib.json",
+    "dev:test-host": "vite --config vite.test-host.config.ts",
+    "types": "tsc -p tsconfig.lib.json",
+    "preview": "vite preview",
+    "prepublishOnly": "npm run build:lib"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.0",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.0",
+    "vue": "^3.4.0",
+    "vue-tsc": "^2.0.0"
+  }
+}
